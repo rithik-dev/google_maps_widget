@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_widget/src/constants.dart';
-import 'package:google_maps_widget/src/marker_info.dart';
+import 'package:google_maps_widget/src/models/direction.dart';
+import 'package:google_maps_widget/src/models/marker_info.dart';
+import 'package:google_maps_widget/src/utils/constants.dart';
 
 class MapsService {
   late LatLng _sourceLatLng;
@@ -18,6 +17,8 @@ class MapsService {
   }
 
   static late String _apiKey;
+
+  static String get apiKey => _apiKey;
   StreamSubscription<LatLng>? _driverCoordinates;
   late void Function(Function() fn) _setState;
 
@@ -37,9 +38,12 @@ class MapsService {
   String? _sourceName;
   String? _destinationName;
   String? _driverName;
-  VoidCallback? _onTapSourceMarker;
-  VoidCallback? _onTapDestinationMarker;
-  void Function(LatLng coordinate)? _onTapDriverMarker;
+  void Function(LatLng)? _onTapSourceMarker;
+  void Function(LatLng)? _onTapDestinationMarker;
+  void Function(LatLng)? _onTapDriverMarker;
+  void Function(LatLng)? _onTapSourceInfoWindow;
+  void Function(LatLng)? _onTapDestinationInfoWindow;
+  void Function(LatLng)? _onTapDriverInfoWindow;
 
   void _setSourceDestinationMarkers() async {
     // setting source and destination markers
@@ -49,8 +53,13 @@ class MapsService {
         position: _sourceLatLng,
         icon: (await _sourceMarkerIconInfo?.bitmapDescriptor) ??
             BitmapDescriptor.defaultMarker,
+        onTap: _onTapSourceMarker == null
+            ? null
+            : () => _onTapSourceMarker!(_sourceLatLng),
         infoWindow: InfoWindow(
-          onTap: _onTapSourceMarker,
+          onTap: _onTapSourceInfoWindow == null
+              ? null
+              : () => _onTapSourceInfoWindow!(_sourceLatLng),
           title: _sourceName,
         ),
       ),
@@ -59,8 +68,13 @@ class MapsService {
         position: _destinationLatLng,
         icon: (await _destinationMarkerIconInfo?.bitmapDescriptor) ??
             BitmapDescriptor.defaultMarker,
+        onTap: _onTapDestinationMarker == null
+            ? null
+            : () => _onTapDestinationMarker!(_destinationLatLng),
         infoWindow: InfoWindow(
-          onTap: _onTapDestinationMarker,
+          onTap: _onTapDestinationInfoWindow == null
+              ? null
+              : () => _onTapDestinationInfoWindow!(_destinationLatLng),
           title: _destinationName,
         ),
       )
@@ -84,7 +98,7 @@ class MapsService {
     //   apiKey: _apiKey,
     // );
 
-    final result = await _Direction.getDirections(
+    final result = await Direction.getDirections(
       origin: _sourceLatLng,
       destination: _destinationLatLng,
     );
@@ -134,10 +148,13 @@ class MapsService {
           markerId: MarkerId('driver'),
           position: coordinate,
           icon: driverMarker,
+          onTap: _onTapDriverMarker == null
+              ? null
+              : () => _onTapDriverMarker!(coordinate),
           infoWindow: InfoWindow(
-            onTap: _onTapDriverMarker == null
+            onTap: _onTapDriverInfoWindow == null
                 ? null
-                : () => _onTapDriverMarker!(coordinate),
+                : () => _onTapDriverInfoWindow!(coordinate),
             title: _driverName,
           ),
         ),
@@ -156,8 +173,11 @@ class MapsService {
     required String apiKey,
     required LatLng sourceLatLng,
     required LatLng destinationLatLng,
-    VoidCallback? onTapSourceMarker,
-    VoidCallback? onTapDestinationMarker,
+    void Function(LatLng)? onTapSourceInfoWindow,
+    void Function(LatLng)? onTapDestinationInfoWindow,
+    void Function(LatLng)? onTapDriverInfoWindow,
+    void Function(LatLng)? onTapSourceMarker,
+    void Function(LatLng)? onTapDestinationMarker,
     void Function(LatLng)? onTapDriverMarker,
     Stream<LatLng>? driverCoordinatesStream,
     LatLng? defaultCameraLocation,
@@ -183,6 +203,9 @@ class MapsService {
     _onTapSourceMarker = onTapSourceMarker;
     _onTapDestinationMarker = onTapDestinationMarker;
     _onTapDriverMarker = onTapDriverMarker;
+    _onTapSourceInfoWindow = onTapSourceInfoWindow;
+    _onTapDestinationInfoWindow = onTapDestinationInfoWindow;
+    _onTapDriverInfoWindow = onTapDriverInfoWindow;
     _routeColor = routeColor;
     _routeWidth = routeWidth;
     _sourceMarkerIconInfo = sourceMarkerIconInfo;
@@ -225,104 +248,5 @@ class MapsService {
     _polyLines.clear();
 
     _setState(() {});
-  }
-}
-
-class _Direction {
-  final LatLngBounds bounds;
-  final List<LatLng> polylinePoints;
-  final String totalDistance;
-  final String totalDuration;
-
-  const _Direction._({
-    required this.bounds,
-    required this.polylinePoints,
-    required this.totalDistance,
-    required this.totalDuration,
-  });
-
-  static const String _baseUrl =
-      'https://maps.googleapis.com/maps/api/directions/json?';
-
-  static Future<_Direction?> getDirections({
-    required LatLng origin,
-    required LatLng destination,
-  }) async {
-    final response = await Dio().get(
-      _baseUrl,
-      queryParameters: {
-        'origin': '${origin.latitude},${origin.longitude}',
-        'destination': '${destination.latitude},${destination.longitude}',
-        'key': MapsService._apiKey,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      // no routes
-      if ((response.data['routes'] as List).isEmpty)
-        return null;
-      else
-        return _Direction._fromMap(response.data);
-    } else
-      return null;
-  }
-
-  static List<LatLng> _decodePolyline(String encoded) {
-    List<LatLng> _polyLines = [];
-    int index = 0, len = encoded.length;
-    int lat = 0, lng = 0;
-
-    while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dLat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dLat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dLng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dLng;
-      final p = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
-      _polyLines.add(p);
-    }
-    return _polyLines;
-  }
-
-  factory _Direction._fromMap(Map<String, dynamic> map) {
-    // Get route information
-    final data = Map<String, dynamic>.from(map['routes'][0]);
-
-    // Bounds
-    final northeast = data['bounds']['northeast'];
-    final southwest = data['bounds']['southwest'];
-    final bounds = LatLngBounds(
-      northeast: LatLng(northeast['lat'], northeast['lng']),
-      southwest: LatLng(southwest['lat'], southwest['lng']),
-    );
-
-    // Distance & Duration
-    String distance = '';
-    String duration = '';
-    if ((data['legs'] as List).isNotEmpty) {
-      final leg = data['legs'][0];
-      distance = leg['distance']['text'];
-      duration = leg['duration']['text'];
-    }
-
-    return _Direction._(
-      bounds: bounds,
-      polylinePoints: _decodePolyline(data['overview_polyline']['points']),
-      totalDistance: distance,
-      totalDuration: duration,
-    );
   }
 }

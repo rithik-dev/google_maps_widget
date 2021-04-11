@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_widget/src/constants.dart';
+import 'package:google_maps_widget/src/utils/constants.dart';
 
 class MarkerIconInfo {
   final IconData? iconData;
@@ -15,12 +15,9 @@ class MarkerIconInfo {
     this.iconData,
     this.assetPath,
     this.assetMarkerSize,
-  }) : assert(
-          (iconData == null && assetPath == null),
-          'iconData & assetPath both cannot be null at the same time',
-        );
+  });
 
-  Future<BitmapDescriptor> get bitmapDescriptor async {
+  Future<BitmapDescriptor?> get bitmapDescriptor async {
     if (assetPath != null)
       return await _getMarkerFromAsset(
         path: assetPath!,
