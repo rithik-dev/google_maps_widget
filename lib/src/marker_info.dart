@@ -21,14 +21,14 @@ class MarkerIconInfo {
         );
 
   Future<BitmapDescriptor> get bitmapDescriptor async {
-    if (iconData != null)
-      return await _getMarkerFromMaterialIcon(iconData: this.iconData!);
-
     if (assetPath != null)
       return await _getMarkerFromAsset(
         path: assetPath!,
         size: assetMarkerSize ?? Constants.DEFAULT_MARKER_SIZE,
       );
+
+    if (iconData != null)
+      return await _getMarkerFromMaterialIcon(iconData: this.iconData!);
 
     return BitmapDescriptor.defaultMarker;
   }
