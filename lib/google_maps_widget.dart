@@ -3,17 +3,18 @@ library google_maps_widget;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_widget/src/constants.dart';
 import 'package:google_maps_widget/src/maps_service.dart';
 
 class GoogleMapsWidget extends StatefulWidget {
   final String apiKey;
   final LatLng sourceLatLng;
   final LatLng destinationLatLng;
-  final VoidCallback onTapSourceMarker;
-  final VoidCallback onTapDestinationMarker;
-  final Function(LatLng) onTapDriverMarker;
-  final Stream<LatLng> driverCoordinatesStream;
-  final LatLng defaultCameraLocation;
+  final VoidCallback? onTapSourceMarker;
+  final VoidCallback? onTapDestinationMarker;
+  final Function(LatLng)? onTapDriverMarker;
+  final Stream<LatLng>? driverCoordinatesStream;
+  final LatLng? defaultCameraLocation;
   final double defaultCameraZoom;
   final String sourceName;
   final String destinationName;
@@ -22,20 +23,20 @@ class GoogleMapsWidget extends StatefulWidget {
   final int routeWidth;
 
   const GoogleMapsWidget({
-    @required this.apiKey,
-    @required this.sourceLatLng,
-    @required this.destinationLatLng,
+    required this.apiKey,
+    required this.sourceLatLng,
+    required this.destinationLatLng,
     this.onTapSourceMarker,
     this.onTapDestinationMarker,
     this.onTapDriverMarker,
     this.driverCoordinatesStream,
     this.defaultCameraLocation,
-    this.defaultCameraZoom = 15,
-    this.sourceName = "Source",
-    this.destinationName = "Destination",
-    this.driverName = "Driver",
-    this.routeColor = Colors.indigo,
-    this.routeWidth = 5,
+    this.defaultCameraZoom = Constants.DEFAULT_CAMERA_ZOOM,
+    this.sourceName = Constants.DEFAULT_SOURCE_NAME,
+    this.destinationName = Constants.DEFAULT_DESTINATION_NAME,
+    this.driverName = Constants.DEFAULT_DRIVER_NAME,
+    this.routeColor = Constants.ROUTE_COLOR,
+    this.routeWidth = Constants.ROUTE_WIDTH,
   });
 
   @override
