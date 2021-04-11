@@ -1,13 +1,11 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_widget/src/constants.dart';
+import 'package:google_maps_widget/src/marker_info.dart';
 
 class MapsService {
   late LatLng _sourceLatLng;
@@ -43,60 +41,14 @@ class MapsService {
   VoidCallback? _onTapDestinationMarker;
   void Function(LatLng coordinate)? _onTapDriverMarker;
 
-  Future<Uint8List> _getBytesFromAsset(String path, int width) async {
-    ByteData data = await rootBundle.load(path);
-    Codec codec = await instantiateImageCodec(
-      data.buffer.asUint8List(),
-      targetWidth: width,
-    );
-    FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
-  }
-
-  //   Future<BitmapDescriptor> _getMarkerFromMaterialIcon(Icon icon) async {
-  //   final _iconData = icon.icon;
-  //   final _pictureRecorder = PictureRecorder();
-  //   final _canvas = Canvas(_pictureRecorder);
-  //   final _textPainter = TextPainter(textDirection: TextDirection.ltr);
-  //   final _iconStr = String.fromCharCode(_iconData.codePoint);
-  //
-  //   _textPainter.text = TextSpan(
-  //       text: _iconStr,
-  //       style: TextStyle(
-  //         letterSpacing: 0.0,
-  //         fontSize: 48.0,
-  //         fontFamily: _iconData.fontFamily,
-  //         color: Colors.red,
-  //       ));
-  //   _textPainter.layout();
-  //   _textPainter.paint(_canvas, Offset(0.0, 0.0));
-  //
-  //   final _picture = _pictureRecorder.endRecording();
-  //   final _image = await _picture.toImage(48, 48);
-  //   final _bytes = await _image.toByteData(format: ImageByteFormat.png);
-  //
-  //   return BitmapDescriptor.fromBytes(_bytes.buffer.asUint8List());
-  // }
-
   void _setSourceDestinationMarkers() async {
-    final sourceMarker = await _getBytesFromAsset(
-      "assets/images/restaurant-marker-icon.png",
-      150,
-    );
-
-    final destinationMarker = await _getBytesFromAsset(
-      "assets/images/house-marker-icon.png",
-      150,
-    );
-
     // setting source and destination markers
     _markers.addAll([
       Marker(
         markerId: MarkerId("source"),
         position: _sourceLatLng,
-        icon: BitmapDescriptor.fromBytes(sourceMarker),
+        icon: (await _sourceMarkerIconInfo?.bitmapDescriptor) ??
+            BitmapDescriptor.defaultMarker,
         infoWindow: InfoWindow(
           onTap: _onTapSourceMarker,
           title: _sourceName,
@@ -105,7 +57,8 @@ class MapsService {
       Marker(
         markerId: MarkerId("destination"),
         position: _destinationLatLng,
-        icon: BitmapDescriptor.fromBytes(destinationMarker),
+        icon: (await _destinationMarkerIconInfo?.bitmapDescriptor) ??
+            BitmapDescriptor.defaultMarker,
         infoWindow: InfoWindow(
           onTap: _onTapDestinationMarker,
           title: _destinationName,
@@ -168,21 +121,19 @@ class MapsService {
   /// This function takes in a [Stream] of [coordinates]
   /// to show driver's location in realtime.
   Future<void> _listenToDriverCoordinates(Stream<LatLng> coordinates) async {
-    final markerBytes = await _getBytesFromAsset(
-      "assets/images/driver-marker-icon.png",
-      150,
-    );
+    final driverMarker = (await _driverMarkerIconInfo?.bitmapDescriptor) ??
+        BitmapDescriptor.defaultMarker;
 
     _driverCoordinates = coordinates.listen((coordinate) {
       _markers.removeWhere(
-            (element) => element.markerId == MarkerId('driver'),
+        (element) => element.markerId == MarkerId('driver'),
       );
 
       _markers.add(
         Marker(
           markerId: MarkerId('driver'),
           position: coordinate,
-          icon: BitmapDescriptor.fromBytes(markerBytes),
+          icon: driverMarker,
           infoWindow: InfoWindow(
             onTap: _onTapDriverMarker == null
                 ? null
@@ -195,6 +146,10 @@ class MapsService {
       _setState(() {});
     });
   }
+
+  MarkerIconInfo? _sourceMarkerIconInfo;
+  MarkerIconInfo? _destinationMarkerIconInfo;
+  MarkerIconInfo? _driverMarkerIconInfo;
 
   void initialize({
     required void setState(void Function() fn),
@@ -212,6 +167,9 @@ class MapsService {
     String? driverName,
     Color? routeColor,
     int? routeWidth,
+    MarkerIconInfo? sourceMarkerIconInfo,
+    MarkerIconInfo? destinationMarkerIconInfo,
+    MarkerIconInfo? driverMarkerIconInfo,
   }) {
     _defaultCameraLocation = defaultCameraLocation;
     _sourceLatLng = sourceLatLng;
@@ -227,6 +185,9 @@ class MapsService {
     _onTapDriverMarker = onTapDriverMarker;
     _routeColor = routeColor;
     _routeWidth = routeWidth;
+    _sourceMarkerIconInfo = sourceMarkerIconInfo;
+    _destinationMarkerIconInfo = destinationMarkerIconInfo;
+    _driverMarkerIconInfo = driverMarkerIconInfo;
 
     _setState(() {
       _setSourceDestinationMarkers();
@@ -241,6 +202,9 @@ class MapsService {
     // _apiKey = null;
     // _sourceLatLng = null;
     // _destinationLatLng = null;
+    _sourceMarkerIconInfo = null;
+    _destinationMarkerIconInfo = null;
+    _driverMarkerIconInfo = null;
     _defaultCameraLocation = null;
     _defaultCameraZoom = null;
     _mapController = null;

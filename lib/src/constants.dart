@@ -9,4 +9,5 @@ class Constants {
   static const DEFAULT_DRIVER_NAME = "Driver";
   static const ROUTE_WIDTH = 5;
   static const ROUTE_COLOR = Colors.indigo;
+  static const DEFAULT_MARKER_SIZE = Size(150, 150);
 }

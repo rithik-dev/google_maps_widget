@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_widget/src/constants.dart';
 import 'package:google_maps_widget/src/maps_service.dart';
+import 'package:google_maps_widget/src/marker_info.dart';
 
 class GoogleMapsWidget extends StatefulWidget {
   final String apiKey;
@@ -21,11 +22,17 @@ class GoogleMapsWidget extends StatefulWidget {
   final String driverName;
   final Color routeColor;
   final int routeWidth;
+  final MarkerIconInfo? sourceMarkerIconInfo;
+  final MarkerIconInfo? destinationMarkerIconInfo;
+  final MarkerIconInfo? driverMarkerIconInfo;
 
   const GoogleMapsWidget({
     required this.apiKey,
     required this.sourceLatLng,
     required this.destinationLatLng,
+    this.sourceMarkerIconInfo,
+    this.destinationMarkerIconInfo,
+    this.driverMarkerIconInfo,
     this.onTapSourceMarker,
     this.onTapDestinationMarker,
     this.onTapDriverMarker,
@@ -64,6 +71,9 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
       routeWidth: this.widget.routeWidth,
       defaultCameraLocation: this.widget.defaultCameraLocation,
       defaultCameraZoom: this.widget.defaultCameraZoom,
+      sourceMarkerIconInfo: this.widget.sourceMarkerIconInfo,
+      destinationMarkerIconInfo: this.widget.destinationMarkerIconInfo,
+      driverMarkerIconInfo: this.widget.driverMarkerIconInfo,
     );
 
     super.initState();
