@@ -1,5 +1,5 @@
 name: google_maps_widget
-description: A new Flutter package.
+description: A widget for flutter developers to easily integrate google maps in their apps. It can be used to make polylines from a source to a destination, and also handle realtime driver location on the map if needed.
 version: 0.0.1
 homepage: https://github.com/rithik-dev/google_maps_widget
 
