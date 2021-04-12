@@ -4,7 +4,7 @@
 [![popularity](https://badges.bar/google_maps_widget/popularity)](https://pub.dev/packages/google_maps_widget/score)
 [![pub points](https://badges.bar/google_maps_widget/pub%20points)](https://pub.dev/packages/google_maps_widget/score)
 
-*A widget for flutter developers to easily integrate google maps in their apps. It can be used to make polylines from a source to a destination, and also handle realtime driver location on the map if needed.*
+*A widget for flutter developers to easily integrate google maps in their apps. It can be used to make polylines from a source to a destination, and also handle a driver's realtime location (if any) on the map.*
 
 ## Features
   * Make polylines (route) between two locations by providing the latitude and longitude for both the locations.

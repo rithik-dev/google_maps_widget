@@ -1,3 +1,10 @@
+## [0.0.4] - 12/05/2021
+
+* Added dartdoc comments
+* Updated package description.
+* Updated README.
+* Updated example app
+
 ## [0.0.3] - 12/04/2021
 
 * Updated package description.
