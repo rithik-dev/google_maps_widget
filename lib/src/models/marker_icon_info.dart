@@ -6,18 +6,41 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_widget/src/utils/constants.dart';
 
+/// Class used to provide information about the marker on the [GoogleMap] widget.
+/// Pass either an asset image [assetPath] or a material [icon].
+/// [assetMarkerSize] can be provided to resize image at [assetPath].
+///
+/// See also:
+///   * [bitmapDescriptor] parameter.
 class MarkerIconInfo {
-  final Icon? icon;
-  final String? assetPath;
-  final Size? assetMarkerSize;
-
-  MarkerIconInfo({
+  const MarkerIconInfo({
     this.icon,
     this.assetPath,
     this.assetMarkerSize,
   });
 
-  Future<BitmapDescriptor?> get bitmapDescriptor async {
+  /// Material icon that can be passed which can be used
+  /// in place of a default [Marker].
+  final Icon? icon;
+
+  /// Asset image path that can be passed which can be used
+  /// in place of a default [Marker].
+  final String? assetPath;
+
+  /// Asset marker size which can be used to
+  /// resize image at [assetPath].
+  /// If null, defaults to [Constants.DEFAULT_MARKER_SIZE].
+  final Size? assetMarkerSize;
+
+  /// This getter is used to get the [BitmapDescriptor] required
+  /// by the [Marker].
+  ///
+  /// If both [assetPath] and [icon] are passed,
+  /// [BitmapDescriptor] created from [assetPath] is returned.
+  ///
+  /// If both [assetPath] and [icon] are not passed,
+  /// then [BitmapDescriptor.defaultMarker] is returned.
+  Future<BitmapDescriptor> get bitmapDescriptor async {
     if (assetPath != null)
       return await _getMarkerFromAsset(
         path: assetPath!,
@@ -29,6 +52,11 @@ class MarkerIconInfo {
     return BitmapDescriptor.defaultMarker;
   }
 
+  /// Creates a [BitmapDescriptor] from an asset image.
+  ///
+  /// [path] is the path of the image.
+  /// [size] can be provided to resize the image.
+  /// Defaults to [Constants.DEFAULT_MARKER_SIZE]
   static Future<BitmapDescriptor> _getMarkerFromAsset({
     required String path,
     Size size = Constants.DEFAULT_MARKER_SIZE,
@@ -47,6 +75,7 @@ class MarkerIconInfo {
     return BitmapDescriptor.fromBytes(_bytes);
   }
 
+  /// Creates a [BitmapDescriptor] from a material [Icon].
   static Future<BitmapDescriptor> _getMarkerFromMaterialIcon({
     required Icon icon,
   }) async {

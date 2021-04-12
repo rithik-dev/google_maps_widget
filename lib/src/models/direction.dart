@@ -2,12 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_widget/src/services/maps_service.dart';
 
+/// A class containing information required by [GoogleMap] to
+/// draw polylines on the map widget.
 class Direction {
-  final LatLngBounds bounds;
-  final List<LatLng> polylinePoints;
-  final String totalDistance;
-  final String totalDuration;
-
   const Direction._({
     required this.bounds,
     required this.polylinePoints,
@@ -15,9 +12,27 @@ class Direction {
     required this.totalDuration,
   });
 
+  /// A latitude/longitude aligned rectangle.
+  /// Used to animate and position the camera in such a
+  /// way that both the source and the destinations markers are visible.
+  final LatLngBounds bounds;
+
+  /// A [List] of [LatLng] objects required by [GoogleMap]
+  /// to display the route.
+  final List<LatLng> polylinePoints;
+
+  /// The total distance between the source and the destination.
+  final String totalDistance;
+
+  /// The total time between the source and the destination.
+  final String totalDuration;
+
+  /// Google Maps API base url.
   static const String _baseUrl =
       'https://maps.googleapis.com/maps/api/directions/json?';
 
+  /// Receives [origin] and [destination] coordinates and calls
+  /// the Google Maps API.
   static Future<Direction?> getDirections({
     required LatLng origin,
     required LatLng destination,
@@ -41,6 +56,8 @@ class Direction {
       return null;
   }
 
+  /// Takes in an [encoded] polyline string from the
+  /// api response and parses the given string in a [List] of [LatLng].
   static List<LatLng> _decodePolyline(String encoded) {
     List<LatLng> _polyLines = [];
     int index = 0, len = encoded.length;
@@ -71,6 +88,8 @@ class Direction {
     return _polyLines;
   }
 
+  /// Private constructor for [Direction] which receives a map from the
+  /// api request and maps the response to the class variables.
   factory Direction._fromMap(Map<String, dynamic> map) {
     // Get route information
     final data = Map<String, dynamic>.from(map['routes'][0]);

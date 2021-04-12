@@ -5,56 +5,141 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_widget/src/models/direction.dart';
 import 'package:google_maps_widget/src/models/marker_icon_info.dart';
 import 'package:google_maps_widget/src/utils/constants.dart';
+import 'package:google_maps_widget/src/main_widget.dart';
 
+/// The underline class for [GoogleMapsWidget] which
+/// contains all the implementations.
 class MapsService {
+  /// setState function
+  late void Function(Function() fn) _setState;
+
+  /// source [LatLng]
   late LatLng _sourceLatLng;
+
+  /// destination [LatLng]
   late LatLng _destinationLatLng;
 
+  /// Google maps controller
   GoogleMapController? _mapController;
 
+  /// source marker info
+  MarkerIconInfo? _sourceMarkerIconInfo;
+
+  /// destination marker info
+  MarkerIconInfo? _destinationMarkerIconInfo;
+
+  /// driver marker info
+  MarkerIconInfo? _driverMarkerIconInfo;
+
+  /// A [Stream] of [LatLng] objects for the driver
+  /// used to render [_driverMarkerIconInfo] on the map
+  /// with the provided [LatLng] objects.
+  ///
+  /// See also:
+  ///   * [_onTapDriverInfoWindow] parameter.
+  ///   * [_onTapDriverMarker] parameter.
+  ///   * [_driverName] parameter.
+  ///
+  /// If null, the [_driverMarkerIconInfo] is not rendered.
+  StreamSubscription<LatLng>? _driverCoordinates;
+
+  /// The initial location of the map's camera.
+  LatLng? _defaultCameraLocation;
+
+  /// The initial zoom of the map's camera.
+  double? _defaultCameraZoom;
+
+  /// Markers to be placed on the map.
+  Set<Marker> _markers = {};
+
+  /// Polylines to be placed on the map.
+  Set<Polyline> _polylines = {};
+
+  /// Displays source [Marker]'s [InfoWindow] displaying [_sourceName]
+  /// when tapped on [_sourceMarkerIconInfo].
+  String? _sourceName;
+
+  /// Displays destination [Marker]'s [InfoWindow] displaying [_destinationName]
+  /// when tapped on [_destinationMarkerIconInfo].
+  String? _destinationName;
+
+  /// Displays driver's [Marker]'s [InfoWindow] displaying [_driverName]
+  /// when tapped on [_driverMarkerIconInfo].
+  String? _driverName;
+
+  /// Called every time source [Marker] is tapped.
+  void Function(LatLng)? _onTapSourceMarker;
+
+  /// Called every time destination [Marker] is tapped.
+  void Function(LatLng)? _onTapDestinationMarker;
+
+  /// Called every time driver [Marker] is tapped.
+  void Function(LatLng)? _onTapDriverMarker;
+
+  /// Called every time source [Marker]'s [InfoWindow] is tapped.
+  void Function(LatLng)? _onTapSourceInfoWindow;
+
+  /// Called every time destination [Marker]'s [InfoWindow] is tapped.
+  void Function(LatLng)? _onTapDestinationInfoWindow;
+
+  /// Called every time driver [Marker]'s [InfoWindow] is tapped.
+  void Function(LatLng)? _onTapDriverInfoWindow;
+
+  /// Called after polylines are created for the given
+  /// [_sourceLatLng] and [_destinationLatLng] and
+  /// totalDistance is initialized.
+  void Function(String?)? _totalDistanceCallback;
+
+  /// Called after polylines are created for the given
+  /// [_sourceLatLng] and [_destinationLatLng] and
+  /// totalTime is initialized.
+  void Function(String?)? _totalTimeCallback;
+
+  /// Color of the route made between [_sourceLatLng] and [_destinationLatLng].
+  Color? _routeColor;
+
+  /// Width of the route made between [_sourceLatLng] and [_destinationLatLng].
+  int? _routeWidth;
+
+  /// The total distance between the source and the destination.
+  String? totalDistance;
+
+  /// The total time between the source and the destination.
+  String? totalTime;
+
+  /// Google maps API Key
+  static late String _apiKey;
+
+  /// Returns the Google Maps API Key passed to the [GoogleMapsWidget].
+  static String get apiKey => _apiKey;
+
+  /// Returns the [_defaultCameraLocation].
+  /// If [_defaultCameraLocation] is null, returns [_sourceLatLng].
+  LatLng get defaultCameraLocation => _defaultCameraLocation ?? _sourceLatLng;
+
+  /// Returns the [_defaultCameraZoom].
+  /// If [_defaultCameraZoom] is null, returns [Constants.DEFAULT_CAMERA_ZOOM].
+  double get defaultCameraZoom =>
+      _defaultCameraZoom ?? Constants.DEFAULT_CAMERA_ZOOM;
+
+  /// Returns markers to be placed on the map.
+  Set<Marker> get markers => _markers;
+
+  /// Returns polylines to be placed on the map.
+  Set<Polyline> get polylines => _polylines;
+
+  /// Sets [GoogleMapController] from [GoogleMap] callback to [_mapController].
   void setController(GoogleMapController _controller) {
     _mapController = _controller;
   }
 
-  static late String _apiKey;
-
-  static String get apiKey => _apiKey;
-  StreamSubscription<LatLng>? _driverCoordinates;
-  late void Function(Function() fn) _setState;
-
-  LatLng get defaultCameraLocation => _defaultCameraLocation ?? _sourceLatLng;
-
-  double get defaultCameraZoom =>
-      _defaultCameraZoom ?? Constants.DEFAULT_CAMERA_ZOOM;
-
-  double? _defaultCameraZoom;
-  LatLng? _defaultCameraLocation;
-  Set<Marker> _markers = {};
-
-  Set<Marker> get markers => _markers;
-  Set<Polyline> _polyLines = {};
-
-  Set<Polyline> get polyLines => _polyLines;
-  String? _sourceName;
-  String? _destinationName;
-  String? _driverName;
-  void Function(LatLng)? _onTapSourceMarker;
-  void Function(LatLng)? _onTapDestinationMarker;
-  void Function(LatLng)? _onTapDriverMarker;
-  void Function(LatLng)? _onTapSourceInfoWindow;
-  void Function(LatLng)? _onTapDestinationInfoWindow;
-  void Function(LatLng)? _onTapDriverInfoWindow;
-  void Function(String?)? _totalTimeCallback;
-  void Function(String?)? _totalDistanceCallback;
-
+  /// setting source and destination markers
   void _setSourceDestinationMarkers() async {
-    // setting source and destination markers
     _markers.addAll([
       Marker(
         markerId: MarkerId("source"),
         position: _sourceLatLng,
-        icon: (await _sourceMarkerIconInfo?.bitmapDescriptor) ??
-            BitmapDescriptor.defaultMarker,
+        icon: (await _sourceMarkerIconInfo?.bitmapDescriptor)!,
         onTap: _onTapSourceMarker == null
             ? null
             : () => _onTapSourceMarker!(_sourceLatLng),
@@ -68,8 +153,7 @@ class MapsService {
       Marker(
         markerId: MarkerId("destination"),
         position: _destinationLatLng,
-        icon: (await _destinationMarkerIconInfo?.bitmapDescriptor) ??
-            BitmapDescriptor.defaultMarker,
+        icon: (await _destinationMarkerIconInfo?.bitmapDescriptor)!,
         onTap: _onTapDestinationMarker == null
             ? null
             : () => _onTapDestinationMarker!(_destinationLatLng),
@@ -85,21 +169,8 @@ class MapsService {
     _setState(() {});
   }
 
-  Color? _routeColor;
-  int? _routeWidth;
-
-  String? totalDistance;
-  String? totalTime;
-
+  /// Build polylines from [_sourceLatLng] to [_destinationLatLng].
   Future<void> _buildPolyLines() async {
-    // final result = await DirectionsRepository(
-    //   dio: Dio()..interceptors.add(PrettyDioLogger()),
-    // ).getDirections(
-    //   origin: _sourceLatLng,
-    //   destination: _destinationLatLng,
-    //   apiKey: _apiKey,
-    // );
-
     final result = await Direction.getDirections(
       origin: _sourceLatLng,
       destination: _destinationLatLng,
@@ -118,7 +189,7 @@ class MapsService {
       points: _polylineCoordinates,
     );
 
-    _polyLines.add(polyline);
+    _polylines.add(polyline);
 
     // setting map such as both source and
     // destinations markers can be seen
@@ -139,11 +210,11 @@ class MapsService {
     _setState(() {});
   }
 
-  /// This function takes in a [Stream] of [coordinates]
-  /// to show driver's location in realtime.
+  /// This function takes in a [Stream] of [LatLng]-[coordinates]
+  /// and renders [_driverMarkerIconInfo] marker to show
+  /// driver's location in realtime.
   Future<void> _listenToDriverCoordinates(Stream<LatLng> coordinates) async {
-    final driverMarker = (await _driverMarkerIconInfo?.bitmapDescriptor) ??
-        BitmapDescriptor.defaultMarker;
+    final driverMarker = (await _driverMarkerIconInfo?.bitmapDescriptor)!;
 
     _driverCoordinates = coordinates.listen((coordinate) {
       _markers.removeWhere(
@@ -171,10 +242,7 @@ class MapsService {
     });
   }
 
-  MarkerIconInfo? _sourceMarkerIconInfo;
-  MarkerIconInfo? _destinationMarkerIconInfo;
-  MarkerIconInfo? _driverMarkerIconInfo;
-
+  /// Initialize all the parameters.
   void initialize({
     required void setState(void Function() fn),
     required String apiKey,
@@ -232,6 +300,8 @@ class MapsService {
     });
   }
 
+  /// Clear all the fields.
+  /// Dispose off controllers.
   void clear() {
     // _apiKey = null;
     // _sourceLatLng = null;
@@ -256,7 +326,7 @@ class MapsService {
     _mapController?.dispose();
     _driverCoordinates?.cancel();
     _markers.clear();
-    _polyLines.clear();
+    _polylines.clear();
 
     _setState(() {});
   }

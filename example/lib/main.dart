@@ -34,7 +34,6 @@ class MyApp extends StatelessWidget {
                 -3.368043154478073 - i / 10000,
               ),
             ),
-            onTap: (l) => print(l),
             sourceName: "This is source name",
             driverName: "Alex",
             onTapDriverMarker: (currentLocation) {
