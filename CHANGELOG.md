@@ -1,3 +1,12 @@
+## [0.0.3] - 12/04/2021
+
+* Updated package description.
+
+## [0.0.2] - 12/04/2021
+
+* Minor readme fixes.
+* Added package description.
+
 ## [0.0.1] - 12/04/2021
 
 * A Google Maps helper widget which can be used to draw route from a given source latitude and longitude. The route is customizable in terms of color and width.
