@@ -12,8 +12,7 @@
   * Almost all the parameters defined in [`google_maps_flutter`](https://pub.dev/packages/google_maps_flutter) for the [`GoogleMap`](https://github.com/flutter/plugins/blob/master/packages/google_maps_flutter/google_maps_flutter/lib/src/google_map.dart) widget can be passed as arguments to the widget.
 
 ### Screenshots
-
-<img src="https://user-images.githubusercontent.com/56810766/114382562-1ee4f880-9baa-11eb-9840-51e0d4ec6a0f.png" height=600/>&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/56810766/114382547-1b517180-9baa-11eb-92c4-0f63edb967c9.png" height=600/>&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/56810766/114382585-24dad980-9baa-11eb-866d-cba86b3b12cd.png" height=600/>&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/56810766/114382575-21dfe900-9baa-11eb-835d-6e7a56341e3c.png" height=600/>
+<img src="https://user-images.githubusercontent.com/56810766/114386990-8f424880-9baf-11eb-94bb-512abfdee36c.png" height=600/>&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/56810766/114386992-8fdadf00-9baf-11eb-84f2-22593024b533.png" height=600/>&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/56810766/114386995-90737580-9baf-11eb-8cd7-056444554204.png" height=600/>&nbsp;&nbsp;<img src="https://user-images.githubusercontent.com/56810766/114386985-8e111b80-9baf-11eb-9bfa-8e4d6d3364f5.png" height=600/>
 
 
 ## Getting Started
@@ -99,7 +98,7 @@ First and foremost, import the widget.
 import 'package:google_maps_widget/google_maps_widget.dart';
 ```
 
-You can now add a [`GoogleMapsWidget`](https://github.com/rithik-dev/google_maps_widget/blob/master/lib/google_maps_widget.dart) widget to your widget tree and pass all the required parameters to get started.
+You can now add a [`GoogleMapsWidget`](https://github.com/rithik-dev/google_maps_widget/blob/master/lib/src/main_widget.dart) widget to your widget tree and pass all the required parameters to get started.
 ```dart
 GoogleMapsWidget(
     apiKey: "YOUR KEY HERE",
@@ -151,6 +150,8 @@ class MyApp extends StatelessWidget {
             onTapDriverMarker: (currentLocation) {
               print("Driver is currently at $currentLocation");
             },
+            totalTimeCallback: (time) => print(time),
+            totalDistanceCallback: (distance) => print(distance),
           ),
         ),
       ),

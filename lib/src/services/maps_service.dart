@@ -44,6 +44,8 @@ class MapsService {
   void Function(LatLng)? _onTapSourceInfoWindow;
   void Function(LatLng)? _onTapDestinationInfoWindow;
   void Function(LatLng)? _onTapDriverInfoWindow;
+  void Function(String?)? _totalTimeCallback;
+  void Function(String?)? _totalDistanceCallback;
 
   void _setSourceDestinationMarkers() async {
     // setting source and destination markers
@@ -127,6 +129,11 @@ class MapsService {
 
       totalDistance = result.totalDistance;
       totalTime = result.totalDuration;
+
+      if (_totalDistanceCallback != null)
+        _totalDistanceCallback!(totalDistance);
+
+      if (_totalTimeCallback != null) _totalTimeCallback!(totalTime);
     }
 
     _setState(() {});
@@ -179,6 +186,8 @@ class MapsService {
     void Function(LatLng)? onTapSourceMarker,
     void Function(LatLng)? onTapDestinationMarker,
     void Function(LatLng)? onTapDriverMarker,
+    void Function(String?)? totalTimeCallback,
+    void Function(String?)? totalDistanceCallback,
     Stream<LatLng>? driverCoordinatesStream,
     LatLng? defaultCameraLocation,
     double? defaultCameraZoom,
@@ -206,6 +215,8 @@ class MapsService {
     _onTapSourceInfoWindow = onTapSourceInfoWindow;
     _onTapDestinationInfoWindow = onTapDestinationInfoWindow;
     _onTapDriverInfoWindow = onTapDriverInfoWindow;
+    _totalTimeCallback = totalTimeCallback;
+    _totalDistanceCallback = totalDistanceCallback;
     _routeColor = routeColor;
     _routeWidth = routeWidth;
     _sourceMarkerIconInfo = sourceMarkerIconInfo;

@@ -40,6 +40,8 @@ class MyApp extends StatelessWidget {
             onTapDriverMarker: (currentLocation) {
               print("Driver is currently at $currentLocation");
             },
+            totalTimeCallback: (time) => print(time),
+            totalDistanceCallback: (distance) => print(distance),
           ),
         ),
       ),

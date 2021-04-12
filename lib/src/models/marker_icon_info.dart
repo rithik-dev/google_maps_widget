@@ -7,12 +7,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_widget/src/utils/constants.dart';
 
 class MarkerIconInfo {
-  final IconData? iconData;
+  final Icon? icon;
   final String? assetPath;
   final Size? assetMarkerSize;
 
   MarkerIconInfo({
-    this.iconData,
+    this.icon,
     this.assetPath,
     this.assetMarkerSize,
   });
@@ -24,8 +24,7 @@ class MarkerIconInfo {
         size: assetMarkerSize ?? Constants.DEFAULT_MARKER_SIZE,
       );
 
-    if (iconData != null)
-      return await _getMarkerFromMaterialIcon(iconData: this.iconData!);
+    if (icon != null) return await _getMarkerFromMaterialIcon(icon: icon!);
 
     return BitmapDescriptor.defaultMarker;
   }
@@ -49,8 +48,9 @@ class MarkerIconInfo {
   }
 
   static Future<BitmapDescriptor> _getMarkerFromMaterialIcon({
-    required IconData iconData,
+    required Icon icon,
   }) async {
+    final iconData = icon.icon!;
     final _pictureRecorder = PictureRecorder();
     final _canvas = Canvas(_pictureRecorder);
     final _textPainter = TextPainter(textDirection: TextDirection.ltr);
@@ -62,7 +62,7 @@ class MarkerIconInfo {
         letterSpacing: 0.0,
         fontSize: 48.0,
         fontFamily: iconData.fontFamily,
-        color: Colors.red,
+        color: icon.color,
       ),
     );
     _textPainter.layout();

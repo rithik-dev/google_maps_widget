@@ -17,6 +17,8 @@ class GoogleMapsWidget extends StatefulWidget {
   final void Function(LatLng)? onTapSourceMarker;
   final void Function(LatLng)? onTapDestinationMarker;
   final void Function(LatLng)? onTapDriverMarker;
+  final void Function(String?)? totalTimeCallback;
+  final void Function(String?)? totalDistanceCallback;
   final Stream<LatLng>? driverCoordinatesStream;
   final LatLng? defaultCameraLocation;
   final double defaultCameraZoom;
@@ -62,6 +64,8 @@ class GoogleMapsWidget extends StatefulWidget {
     required this.apiKey,
     required this.sourceLatLng,
     required this.destinationLatLng,
+    this.totalDistanceCallback,
+    this.totalTimeCallback,
     this.onMapCreated,
     this.sourceMarkerIconInfo,
     this.destinationMarkerIconInfo,
@@ -141,6 +145,8 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
       sourceMarkerIconInfo: this.widget.sourceMarkerIconInfo,
       destinationMarkerIconInfo: this.widget.destinationMarkerIconInfo,
       driverMarkerIconInfo: this.widget.driverMarkerIconInfo,
+      totalTimeCallback: this.widget.totalTimeCallback,
+      totalDistanceCallback: this.widget.totalDistanceCallback,
     );
 
     super.initState();
