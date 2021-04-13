@@ -15,6 +15,11 @@ class MyApp extends StatelessWidget {
             apiKey: "YOUR KEY HERE",
             sourceLatLng: LatLng(40.484000837597925, -3.369978368282318),
             destinationLatLng: LatLng(40.48017307700204, -3.3618026599287987),
+
+            ///////////////////////////////////////////////////////
+            //////////////    OPTIONAL PARAMETERS    //////////////
+            ///////////////////////////////////////////////////////
+
             routeWidth: 2,
             sourceMarkerIconInfo: MarkerIconInfo(
               assetPath: "assets/images/house-marker-icon.png",
@@ -29,7 +34,7 @@ class MyApp extends StatelessWidget {
             // mock stream
             driverCoordinatesStream: Stream.periodic(
               Duration(milliseconds: 500),
-                  (i) => LatLng(
+              (i) => LatLng(
                 40.47747872288886 + i / 10000,
                 -3.368043154478073 - i / 10000,
               ),

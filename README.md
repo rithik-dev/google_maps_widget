@@ -102,6 +102,7 @@ import 'package:google_maps_widget/google_maps_widget.dart';
 ```
 
 You can now add a [`GoogleMapsWidget`](https://github.com/rithik-dev/google_maps_widget/blob/master/lib/src/main_widget.dart) widget to your widget tree and pass all the required parameters to get started.
+This widget will create a route between the source and the destination LatLng's provided.
 ```dart
 GoogleMapsWidget(
     apiKey: "YOUR KEY HERE",
@@ -129,6 +130,11 @@ class MyApp extends StatelessWidget {
             apiKey: "YOUR KEY HERE",
             sourceLatLng: LatLng(40.484000837597925, -3.369978368282318),
             destinationLatLng: LatLng(40.48017307700204, -3.3618026599287987),
+
+            ///////////////////////////////////////////////////////
+            //////////////    OPTIONAL PARAMETERS    //////////////
+            ///////////////////////////////////////////////////////
+
             routeWidth: 2,
             sourceMarkerIconInfo: MarkerIconInfo(
               assetPath: "assets/images/house-marker-icon.png",

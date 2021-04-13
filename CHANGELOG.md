@@ -1,4 +1,8 @@
-## [0.0.4] - 12/05/2021
+## [0.0.5] - 13/04/2021
+
+* Added web support
+
+## [0.0.4] - 12/04/2021
 
 * Added dartdoc comments
 * Updated package description.
