@@ -1,3 +1,7 @@
+## [0.0.6] - 14/04/2021
+
+* Updated README.md
+
 ## [0.0.5] - 13/04/2021
 
 * Added web support

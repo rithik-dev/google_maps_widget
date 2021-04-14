@@ -84,6 +84,20 @@ import GoogleMaps
   }
 }
 ```
+### Web
+
+Modify web/index.html
+
+Get an API Key for Google Maps JavaScript API. Get started [here](https://developers.google.com/maps/documentation/javascript/get-api-key).
+Modify the `<head>` tag of your `web/index.html` to load the Google Maps JavaScript API, like so:
+```html
+<head>
+
+  <!-- // Other stuff -->
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+</head>
+```
 
 ## Usage
 
