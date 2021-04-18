@@ -175,6 +175,8 @@ class MyApp extends StatelessWidget {
             },
             totalTimeCallback: (time) => print(time),
             totalDistanceCallback: (distance) => print(distance),
+
+            /// and a lot more...
           ),
         ),
       ),

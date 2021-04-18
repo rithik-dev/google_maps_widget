@@ -12,6 +12,7 @@ import 'package:google_maps_widget/src/utils/constants.dart';
 /// and also handle a driver's realtime location (if any) on the map.
 class GoogleMapsWidget extends StatefulWidget {
   const GoogleMapsWidget({
+    Key? key,
     required this.apiKey,
     required this.sourceLatLng,
     required this.destinationLatLng,
@@ -29,6 +30,12 @@ class GoogleMapsWidget extends StatefulWidget {
     this.onTapDriverInfoWindow,
     this.driverCoordinatesStream,
     this.defaultCameraLocation,
+    this.markers = const <Marker>{},
+    this.polylines = const <Polyline>{},
+    this.showPolyline = true,
+    this.showSourceMarker = true,
+    this.showDestinationMarker = true,
+    this.showDriverMarker = true,
     this.defaultCameraZoom = Constants.DEFAULT_CAMERA_ZOOM,
     this.sourceName = Constants.DEFAULT_SOURCE_NAME,
     this.destinationName = Constants.DEFAULT_DESTINATION_NAME,
@@ -157,6 +164,27 @@ class GoogleMapsWidget extends StatefulWidget {
   /// See also:
   ///   * [driverCoordinatesStream] parameter.
   final MarkerIconInfo? driverMarkerIconInfo;
+
+  /// Whether to show the source marker at [sourceLatLng].
+  ///
+  /// Defaults to true.
+  final bool showSourceMarker;
+
+  /// Whether to show the destination marker at [destinationLatLng].
+  ///
+  /// Defaults to true.
+  final bool showDestinationMarker;
+
+  /// Whether to show the driver marker.
+  ///
+  /// Defaults to true.
+  final bool showDriverMarker;
+
+  /// Whether to show the generated polyline from [sourceLatLng]
+  /// to [destinationLatLng].
+  ///
+  /// Defaults to true.
+  final bool showPolyline;
 
   /// Callback method for when the map is ready to be used.
   ///
@@ -287,6 +315,15 @@ class GoogleMapsWidget extends StatefulWidget {
   /// Circles to be placed on the map.
   final Set<Circle> circles;
 
+  /// Markers to be placed on the map. (apart from the source and destination markers).
+  final Set<Marker> markers;
+
+  /// Polylines to be placed on the map. (apart from the one generated
+  /// between the [sourceLatLng] and the [destinationLatLng].
+  ///
+  /// You can disable the generated polyline by setting the [showPolyline] to false.
+  final Set<Polyline> polylines;
+
   /// Tile overlays to be placed on the map.
   final Set<TileOverlay> tileOverlays;
 
@@ -337,6 +374,10 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
       driverMarkerIconInfo: this.widget.driverMarkerIconInfo,
       totalTimeCallback: this.widget.totalTimeCallback,
       totalDistanceCallback: this.widget.totalDistanceCallback,
+      showSourceMarker: this.widget.showSourceMarker,
+      showDestinationMarker: this.widget.showDestinationMarker,
+      showDriverMarker: this.widget.showDriverMarker,
+      showPolyline: this.widget.showPolyline,
     );
     super.initState();
   }
@@ -350,18 +391,18 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
+      key: this.widget.key,
       initialCameraPosition: CameraPosition(
         target: _mapsService.defaultCameraLocation,
         zoom: _mapsService.defaultCameraZoom,
       ),
-      markers: _mapsService.markers,
-      polylines: _mapsService.polylines,
+      markers: {..._mapsService.markers, ...this.widget.markers},
+      polylines: {..._mapsService.polylines, ...this.widget.polylines},
       onMapCreated: (controller) {
         _mapsService.setController(controller);
         if (this.widget.onMapCreated != null)
           return this.widget.onMapCreated!(controller);
       },
-
       /////////////////////////////////////////////////
       // OTHER GOOGLE MAPS PARAMS
       /////////////////////////////////////////////////

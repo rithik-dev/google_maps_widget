@@ -1,3 +1,9 @@
+## [0.0.7] - 18/04/2021
+
+* Set of markers can be passed to show on the map (apart from the source/destination/driver markers).
+* Set of polylines can be passed to show on the map apart from the one created between source and destination.
+* Added the option to not render the created markers and polylines.
+
 ## [0.0.6] - 14/04/2021
 
 * Updated README.md

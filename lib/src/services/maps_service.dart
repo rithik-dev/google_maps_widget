@@ -133,37 +133,60 @@ class MapsService {
     _mapController = _controller;
   }
 
+  /// Whether to show the source marker at [_sourceLatLng].
+  ///
+  /// Defaults to true.
+  late bool _showSourceMarker;
+
+  /// Whether to show the destination marker at [_destinationLatLng].
+  ///
+  /// Defaults to true.
+  late bool _showDestinationMarker;
+
+  /// Whether to show the driver marker.
+  ///
+  /// Defaults to true.
+  late bool _showDriverMarker;
+
+  /// Whether to show the generated polyline from [_sourceLatLng]
+  /// to [_destinationLatLng].
+  ///
+  /// Defaults to true.
+  late bool _showPolyline;
+
   /// setting source and destination markers
   void _setSourceDestinationMarkers() async {
     _markers.addAll([
-      Marker(
-        markerId: MarkerId("source"),
-        position: _sourceLatLng,
-        icon: (await _sourceMarkerIconInfo?.bitmapDescriptor)!,
-        onTap: _onTapSourceMarker == null
-            ? null
-            : () => _onTapSourceMarker!(_sourceLatLng),
-        infoWindow: InfoWindow(
-          onTap: _onTapSourceInfoWindow == null
+      if (_showSourceMarker)
+        Marker(
+          markerId: MarkerId("source"),
+          position: _sourceLatLng,
+          icon: (await _sourceMarkerIconInfo?.bitmapDescriptor)!,
+          onTap: _onTapSourceMarker == null
               ? null
-              : () => _onTapSourceInfoWindow!(_sourceLatLng),
-          title: _sourceName,
+              : () => _onTapSourceMarker!(_sourceLatLng),
+          infoWindow: InfoWindow(
+            onTap: _onTapSourceInfoWindow == null
+                ? null
+                : () => _onTapSourceInfoWindow!(_sourceLatLng),
+            title: _sourceName,
+          ),
         ),
-      ),
-      Marker(
-        markerId: MarkerId("destination"),
-        position: _destinationLatLng,
-        icon: (await _destinationMarkerIconInfo?.bitmapDescriptor)!,
-        onTap: _onTapDestinationMarker == null
-            ? null
-            : () => _onTapDestinationMarker!(_destinationLatLng),
-        infoWindow: InfoWindow(
-          onTap: _onTapDestinationInfoWindow == null
+      if (_showDestinationMarker)
+        Marker(
+          markerId: MarkerId("destination"),
+          position: _destinationLatLng,
+          icon: (await _destinationMarkerIconInfo?.bitmapDescriptor)!,
+          onTap: _onTapDestinationMarker == null
               ? null
-              : () => _onTapDestinationInfoWindow!(_destinationLatLng),
-          title: _destinationName,
-        ),
-      )
+              : () => _onTapDestinationMarker!(_destinationLatLng),
+          infoWindow: InfoWindow(
+            onTap: _onTapDestinationInfoWindow == null
+                ? null
+                : () => _onTapDestinationInfoWindow!(_destinationLatLng),
+            title: _destinationName,
+          ),
+        )
     ]);
 
     _setState(() {});
@@ -217,6 +240,8 @@ class MapsService {
     final driverMarker = (await _driverMarkerIconInfo?.bitmapDescriptor)!;
 
     _driverCoordinates = coordinates.listen((coordinate) {
+      if (!_showDriverMarker) return;
+
       _markers.removeWhere(
         (element) => element.markerId == MarkerId('driver'),
       );
@@ -267,6 +292,10 @@ class MapsService {
     MarkerIconInfo? sourceMarkerIconInfo,
     MarkerIconInfo? destinationMarkerIconInfo,
     MarkerIconInfo? driverMarkerIconInfo,
+    bool showSourceMarker = true,
+    bool showDestinationMarker = true,
+    bool showDriverMarker = true,
+    bool showPolyline = true,
   }) {
     _defaultCameraLocation = defaultCameraLocation;
     _sourceLatLng = sourceLatLng;
@@ -290,10 +319,15 @@ class MapsService {
     _sourceMarkerIconInfo = sourceMarkerIconInfo;
     _destinationMarkerIconInfo = destinationMarkerIconInfo;
     _driverMarkerIconInfo = driverMarkerIconInfo;
+    _showSourceMarker = showSourceMarker;
+    _showDestinationMarker = showDestinationMarker;
+    _showDriverMarker = showDriverMarker;
+    _showPolyline = showPolyline;
 
     _setState(() {
       _setSourceDestinationMarkers();
-      _buildPolyLines();
+
+      if (_showPolyline) _buildPolyLines();
 
       if (driverCoordinatesStream != null)
         _listenToDriverCoordinates(driverCoordinatesStream);
