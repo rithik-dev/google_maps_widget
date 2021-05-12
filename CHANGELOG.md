@@ -1,3 +1,7 @@
+## [0.0.8] - 12/05/2021
+
+* Fixed key parameter
+
 ## [0.0.7] - 18/04/2021
 
 * Set of markers can be passed to show on the map (apart from the source/destination/driver markers).

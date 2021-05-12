@@ -70,7 +70,7 @@ class GoogleMapsWidget extends StatefulWidget {
     this.onCameraIdle,
     this.onTap,
     this.onLongPress,
-  });
+  }) : super(key: key);
 
   /// Google Maps API Key.
   final String apiKey;
@@ -391,7 +391,6 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
   @override
   Widget build(BuildContext context) {
     return GoogleMap(
-      key: this.widget.key,
       initialCameraPosition: CameraPosition(
         target: _mapsService.defaultCameraLocation,
         zoom: _mapsService.defaultCameraZoom,
