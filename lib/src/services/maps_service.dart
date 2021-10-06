@@ -361,7 +361,5 @@ class MapsService {
     _driverCoordinates?.cancel();
     _markers.clear();
     _polylines.clear();
-
-    _setState(() {});
   }
 }

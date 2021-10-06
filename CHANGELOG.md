@@ -1,3 +1,7 @@
+## [0.0.9] - 06/10/2021
+
+* Fixed issue #2
+
 ## [0.0.8] - 12/05/2021
 
 * Fixed key parameter
@@ -18,7 +22,7 @@
 
 ## [0.0.4] - 12/04/2021
 
-* Added dartdoc comments
+* Added dart doc comments
 * Updated package description.
 * Updated README.
 * Updated example app
