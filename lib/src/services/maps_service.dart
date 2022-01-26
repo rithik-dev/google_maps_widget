@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_widget/src/main_widget.dart';
 import 'package:google_maps_widget/src/models/direction.dart';
 import 'package:google_maps_widget/src/models/marker_icon_info.dart';
 import 'package:google_maps_widget/src/utils/constants.dart';
-import 'package:google_maps_widget/src/main_widget.dart';
 
 /// The underline class for [GoogleMapsWidget] which
 /// contains all the implementations.
@@ -50,10 +51,10 @@ class MapsService {
   double? _defaultCameraZoom;
 
   /// Markers to be placed on the map.
-  Set<Marker> _markers = {};
+  final _markers = <Marker>{};
 
   /// Polylines to be placed on the map.
-  Set<Polyline> _polylines = {};
+  final _polylines = <Polyline>{};
 
   /// Displays source [Marker]'s [InfoWindow] displaying [_sourceName]
   /// when tapped on [_sourceMarkerIconInfo].
@@ -118,9 +119,9 @@ class MapsService {
   LatLng get defaultCameraLocation => _defaultCameraLocation ?? _sourceLatLng;
 
   /// Returns the [_defaultCameraZoom].
-  /// If [_defaultCameraZoom] is null, returns [Constants.DEFAULT_CAMERA_ZOOM].
+  /// If [_defaultCameraZoom] is null, returns [Constants.kDefaultCameraZoom].
   double get defaultCameraZoom =>
-      _defaultCameraZoom ?? Constants.DEFAULT_CAMERA_ZOOM;
+      _defaultCameraZoom ?? Constants.kDefaultCameraZoom;
 
   /// Returns markers to be placed on the map.
   Set<Marker> get markers => _markers;
@@ -159,7 +160,7 @@ class MapsService {
     _markers.addAll([
       if (_showSourceMarker)
         Marker(
-          markerId: MarkerId("source"),
+          markerId: const MarkerId("source"),
           position: _sourceLatLng,
           icon: (await _sourceMarkerIconInfo?.bitmapDescriptor)!,
           onTap: _onTapSourceMarker == null
@@ -174,7 +175,7 @@ class MapsService {
         ),
       if (_showDestinationMarker)
         Marker(
-          markerId: MarkerId("destination"),
+          markerId: const MarkerId("destination"),
           position: _destinationLatLng,
           icon: (await _destinationMarkerIconInfo?.bitmapDescriptor)!,
           onTap: _onTapDestinationMarker == null
@@ -206,9 +207,9 @@ class MapsService {
     }
 
     final polyline = Polyline(
-      polylineId: PolylineId("poly_line"),
-      color: _routeColor ?? Constants.ROUTE_COLOR,
-      width: _routeWidth ?? Constants.ROUTE_WIDTH,
+      polylineId: const PolylineId("poly_line"),
+      color: _routeColor ?? Constants.kRouteColor,
+      width: _routeWidth ?? Constants.kRouteWidth,
       points: _polylineCoordinates,
     );
 
@@ -224,8 +225,9 @@ class MapsService {
       totalDistance = result.totalDistance;
       totalTime = result.totalDuration;
 
-      if (_totalDistanceCallback != null)
+      if (_totalDistanceCallback != null) {
         _totalDistanceCallback!(totalDistance);
+      }
 
       if (_totalTimeCallback != null) _totalTimeCallback!(totalTime);
     }
@@ -243,12 +245,12 @@ class MapsService {
       if (!_showDriverMarker) return;
 
       _markers.removeWhere(
-        (element) => element.markerId == MarkerId('driver'),
+        (element) => element.markerId == const MarkerId('driver'),
       );
 
       _markers.add(
         Marker(
-          markerId: MarkerId('driver'),
+          markerId: const MarkerId('driver'),
           position: coordinate,
           icon: driverMarker,
           onTap: _onTapDriverMarker == null
@@ -269,7 +271,7 @@ class MapsService {
 
   /// Initialize all the parameters.
   void initialize({
-    required void setState(void Function() fn),
+    required void Function(void Function() fn) setState,
     required String apiKey,
     required LatLng sourceLatLng,
     required LatLng destinationLatLng,
@@ -329,8 +331,9 @@ class MapsService {
 
       if (_showPolyline) _buildPolyLines();
 
-      if (driverCoordinatesStream != null)
+      if (driverCoordinatesStream != null) {
         _listenToDriverCoordinates(driverCoordinatesStream);
+      }
     });
   }
 

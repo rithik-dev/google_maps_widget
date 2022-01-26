@@ -48,12 +48,14 @@ class Direction {
 
     if (response.statusCode == 200) {
       // no routes
-      if ((response.data['routes'] as List).isEmpty)
+      if ((response.data['routes'] as List).isEmpty) {
         return null;
-      else
+      } else {
         return Direction._fromMap(response.data);
-    } else
+      }
+    } else {
       return null;
+    }
   }
 
   /// Takes in an [encoded] polyline string from the

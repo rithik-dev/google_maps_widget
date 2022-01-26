@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -36,12 +37,12 @@ class GoogleMapsWidget extends StatefulWidget {
     this.showSourceMarker = true,
     this.showDestinationMarker = true,
     this.showDriverMarker = true,
-    this.defaultCameraZoom = Constants.DEFAULT_CAMERA_ZOOM,
-    this.sourceName = Constants.DEFAULT_SOURCE_NAME,
-    this.destinationName = Constants.DEFAULT_DESTINATION_NAME,
-    this.driverName = Constants.DEFAULT_DRIVER_NAME,
-    this.routeColor = Constants.ROUTE_COLOR,
-    this.routeWidth = Constants.ROUTE_WIDTH,
+    this.defaultCameraZoom = Constants.kDefaultCameraZoom,
+    this.sourceName = Constants.kDefaultSourceName,
+    this.destinationName = Constants.kDefaultDestinationName,
+    this.driverName = Constants.kDefaultDriverName,
+    this.routeColor = Constants.kRouteColor,
+    this.routeWidth = Constants.kRouteWidth,
 
     // other google maps params
     this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
@@ -126,30 +127,30 @@ class GoogleMapsWidget extends StatefulWidget {
   final LatLng? defaultCameraLocation;
 
   /// The initial zoom of the map's camera.
-  /// Defaults to [Constants.DEFAULT_CAMERA_ZOOM].
+  /// Defaults to [Constants.kDefaultCameraZoom].
   final double defaultCameraZoom;
 
   /// Displays source [Marker]'s [InfoWindow] displaying [sourceName]
   /// when tapped on [sourceMarkerIconInfo].
-  /// Defaults to [Constants.DEFAULT_SOURCE_NAME].
+  /// Defaults to [Constants.kDefaultSourceName].
   final String sourceName;
 
   /// Displays destination [Marker]'s [InfoWindow] displaying [destinationName]
   /// when tapped on [destinationMarkerIconInfo].
-  /// Defaults to [Constants.DEFAULT_DESTINATION_NAME].
+  /// Defaults to [Constants.kDefaultDestinationName].
   final String destinationName;
 
   /// Displays driver's [Marker]'s [InfoWindow] displaying [driverName]
   /// when tapped on [driverMarkerIconInfo].
-  /// Defaults to [Constants.DEFAULT_DRIVER_NAME].
+  /// Defaults to [Constants.kDefaultDriverName].
   final String driverName;
 
   /// Color of the route made between [sourceLatLng] and [destinationLatLng].
-  /// Defaults to [Constants.ROUTE_COLOR].
+  /// Defaults to [Constants.kRouteColor].
   final Color routeColor;
 
   /// Width of the route made between [sourceLatLng] and [destinationLatLng].
-  /// Defaults to [Constants.ROUTE_WIDTH].
+  /// Defaults to [Constants.kRouteWidth].
   final int routeWidth;
 
   /// The marker which is rendered on the location [sourceLatLng].
@@ -352,32 +353,32 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
   void initState() {
     _mapsService.initialize(
       setState: setState,
-      apiKey: this.widget.apiKey,
-      sourceLatLng: this.widget.sourceLatLng,
-      destinationLatLng: this.widget.destinationLatLng,
-      onTapSourceMarker: this.widget.onTapSourceMarker,
-      onTapDestinationMarker: this.widget.onTapDestinationMarker,
-      onTapDriverMarker: this.widget.onTapDriverMarker,
-      onTapSourceInfoWindow: this.widget.onTapSourceInfoWindow,
-      onTapDestinationInfoWindow: this.widget.onTapDestinationInfoWindow,
-      onTapDriverInfoWindow: this.widget.onTapDriverInfoWindow,
-      driverCoordinatesStream: this.widget.driverCoordinatesStream,
-      sourceName: this.widget.sourceName,
-      destinationName: this.widget.destinationName,
-      driverName: this.widget.driverName,
-      routeColor: this.widget.routeColor,
-      routeWidth: this.widget.routeWidth,
-      defaultCameraLocation: this.widget.defaultCameraLocation,
-      defaultCameraZoom: this.widget.defaultCameraZoom,
-      sourceMarkerIconInfo: this.widget.sourceMarkerIconInfo,
-      destinationMarkerIconInfo: this.widget.destinationMarkerIconInfo,
-      driverMarkerIconInfo: this.widget.driverMarkerIconInfo,
-      totalTimeCallback: this.widget.totalTimeCallback,
-      totalDistanceCallback: this.widget.totalDistanceCallback,
-      showSourceMarker: this.widget.showSourceMarker,
-      showDestinationMarker: this.widget.showDestinationMarker,
-      showDriverMarker: this.widget.showDriverMarker,
-      showPolyline: this.widget.showPolyline,
+      apiKey: widget.apiKey,
+      sourceLatLng: widget.sourceLatLng,
+      destinationLatLng: widget.destinationLatLng,
+      onTapSourceMarker: widget.onTapSourceMarker,
+      onTapDestinationMarker: widget.onTapDestinationMarker,
+      onTapDriverMarker: widget.onTapDriverMarker,
+      onTapSourceInfoWindow: widget.onTapSourceInfoWindow,
+      onTapDestinationInfoWindow: widget.onTapDestinationInfoWindow,
+      onTapDriverInfoWindow: widget.onTapDriverInfoWindow,
+      driverCoordinatesStream: widget.driverCoordinatesStream,
+      sourceName: widget.sourceName,
+      destinationName: widget.destinationName,
+      driverName: widget.driverName,
+      routeColor: widget.routeColor,
+      routeWidth: widget.routeWidth,
+      defaultCameraLocation: widget.defaultCameraLocation,
+      defaultCameraZoom: widget.defaultCameraZoom,
+      sourceMarkerIconInfo: widget.sourceMarkerIconInfo,
+      destinationMarkerIconInfo: widget.destinationMarkerIconInfo,
+      driverMarkerIconInfo: widget.driverMarkerIconInfo,
+      totalTimeCallback: widget.totalTimeCallback,
+      totalDistanceCallback: widget.totalDistanceCallback,
+      showSourceMarker: widget.showSourceMarker,
+      showDestinationMarker: widget.showDestinationMarker,
+      showDriverMarker: widget.showDriverMarker,
+      showPolyline: widget.showPolyline,
     );
     super.initState();
   }
@@ -395,42 +396,43 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
         target: _mapsService.defaultCameraLocation,
         zoom: _mapsService.defaultCameraZoom,
       ),
-      markers: {..._mapsService.markers, ...this.widget.markers},
-      polylines: {..._mapsService.polylines, ...this.widget.polylines},
+      markers: {..._mapsService.markers, ...widget.markers},
+      polylines: {..._mapsService.polylines, ...widget.polylines},
       onMapCreated: (controller) {
         _mapsService.setController(controller);
-        if (this.widget.onMapCreated != null)
-          return this.widget.onMapCreated!(controller);
+        if (widget.onMapCreated != null) {
+          return widget.onMapCreated!(controller);
+        }
       },
       /////////////////////////////////////////////////
       // OTHER GOOGLE MAPS PARAMS
       /////////////////////////////////////////////////
-      gestureRecognizers: this.widget.gestureRecognizers,
-      compassEnabled: this.widget.compassEnabled,
-      mapToolbarEnabled: this.widget.mapToolbarEnabled,
-      cameraTargetBounds: this.widget.cameraTargetBounds,
-      mapType: this.widget.mapType,
-      minMaxZoomPreference: this.widget.minMaxZoomPreference,
-      rotateGesturesEnabled: this.widget.rotateGesturesEnabled,
-      scrollGesturesEnabled: this.widget.scrollGesturesEnabled,
-      zoomControlsEnabled: this.widget.zoomControlsEnabled,
-      zoomGesturesEnabled: this.widget.zoomGesturesEnabled,
-      liteModeEnabled: this.widget.liteModeEnabled,
-      tiltGesturesEnabled: this.widget.tiltGesturesEnabled,
-      myLocationEnabled: this.widget.myLocationEnabled,
-      myLocationButtonEnabled: this.widget.myLocationButtonEnabled,
-      padding: this.widget.padding,
-      indoorViewEnabled: this.widget.indoorViewEnabled,
-      trafficEnabled: this.widget.trafficEnabled,
-      buildingsEnabled: this.widget.buildingsEnabled,
-      polygons: this.widget.polygons,
-      circles: this.widget.circles,
-      onCameraMoveStarted: this.widget.onCameraMoveStarted,
-      tileOverlays: this.widget.tileOverlays,
-      onCameraMove: this.widget.onCameraMove,
-      onCameraIdle: this.widget.onCameraIdle,
-      onTap: this.widget.onTap,
-      onLongPress: this.widget.onLongPress,
+      gestureRecognizers: widget.gestureRecognizers,
+      compassEnabled: widget.compassEnabled,
+      mapToolbarEnabled: widget.mapToolbarEnabled,
+      cameraTargetBounds: widget.cameraTargetBounds,
+      mapType: widget.mapType,
+      minMaxZoomPreference: widget.minMaxZoomPreference,
+      rotateGesturesEnabled: widget.rotateGesturesEnabled,
+      scrollGesturesEnabled: widget.scrollGesturesEnabled,
+      zoomControlsEnabled: widget.zoomControlsEnabled,
+      zoomGesturesEnabled: widget.zoomGesturesEnabled,
+      liteModeEnabled: widget.liteModeEnabled,
+      tiltGesturesEnabled: widget.tiltGesturesEnabled,
+      myLocationEnabled: widget.myLocationEnabled,
+      myLocationButtonEnabled: widget.myLocationButtonEnabled,
+      padding: widget.padding,
+      indoorViewEnabled: widget.indoorViewEnabled,
+      trafficEnabled: widget.trafficEnabled,
+      buildingsEnabled: widget.buildingsEnabled,
+      polygons: widget.polygons,
+      circles: widget.circles,
+      onCameraMoveStarted: widget.onCameraMoveStarted,
+      tileOverlays: widget.tileOverlays,
+      onCameraMove: widget.onCameraMove,
+      onCameraIdle: widget.onCameraIdle,
+      onTap: widget.onTap,
+      onLongPress: widget.onLongPress,
     );
   }
 }

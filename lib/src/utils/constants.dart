@@ -6,11 +6,11 @@ import 'package:google_maps_widget/src/services/maps_service.dart';
 class Constants {
   Constants._();
 
-  static const DEFAULT_CAMERA_ZOOM = 15.0;
-  static const DEFAULT_SOURCE_NAME = "Source";
-  static const DEFAULT_DESTINATION_NAME = "Destination";
-  static const DEFAULT_DRIVER_NAME = "Driver";
-  static const ROUTE_WIDTH = 5;
-  static const ROUTE_COLOR = Colors.indigo;
-  static const DEFAULT_MARKER_SIZE = const Size.square(150);
+  static const kDefaultCameraZoom = 15.0;
+  static const kDefaultSourceName = "Source";
+  static const kDefaultDestinationName = "Destination";
+  static const kDefaultDriverName = "Driver";
+  static const kRouteWidth = 5;
+  static const kRouteColor = Colors.indigo;
+  static const kDefaultMarkerSize = Size.square(150);
 }

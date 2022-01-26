@@ -1,6 +1,6 @@
 name: google_maps_widget
 description: A Flutter package which can be used to make polylines(route) from a source to a destination, and also handle a driver's realtime location (if any) on the map.
-version: 0.0.9
+version: 1.0.0
 homepage: https://github.com/rithik-dev/google_maps_widget
 
 environment:
@@ -10,12 +10,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_maps_flutter: ^2.0.3
-  google_maps_flutter_web: ^0.3.0
-  dio: ^4.0.0
+  google_maps_flutter: ^2.1.1
+  dio: ^4.0.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_lints: ^1.0.4
 
 flutter:

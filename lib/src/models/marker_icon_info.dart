@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -29,7 +28,7 @@ class MarkerIconInfo {
 
   /// Asset marker size which can be used to
   /// resize image at [assetPath].
-  /// If null, defaults to [Constants.DEFAULT_MARKER_SIZE].
+  /// If null, defaults to [Constants.kDefaultMarkerSize].
   final Size? assetMarkerSize;
 
   /// This getter is used to get the [BitmapDescriptor] required
@@ -41,11 +40,12 @@ class MarkerIconInfo {
   /// If both [assetPath] and [icon] are not passed,
   /// then [BitmapDescriptor.defaultMarker] is returned.
   Future<BitmapDescriptor> get bitmapDescriptor async {
-    if (assetPath != null)
+    if (assetPath != null) {
       return await _getMarkerFromAsset(
         path: assetPath!,
-        size: assetMarkerSize ?? Constants.DEFAULT_MARKER_SIZE,
+        size: assetMarkerSize ?? Constants.kDefaultMarkerSize,
       );
+    }
 
     if (icon != null) return await _getMarkerFromMaterialIcon(icon: icon!);
 
@@ -56,10 +56,10 @@ class MarkerIconInfo {
   ///
   /// [path] is the path of the image.
   /// [size] can be provided to resize the image.
-  /// Defaults to [Constants.DEFAULT_MARKER_SIZE]
+  /// Defaults to [Constants.kDefaultMarkerSize]
   static Future<BitmapDescriptor> _getMarkerFromAsset({
     required String path,
-    Size size = Constants.DEFAULT_MARKER_SIZE,
+    Size size = Constants.kDefaultMarkerSize,
   }) async {
     ByteData data = await rootBundle.load(path);
     Codec codec = await instantiateImageCodec(
@@ -95,7 +95,7 @@ class MarkerIconInfo {
       ),
     );
     _textPainter.layout();
-    _textPainter.paint(_canvas, Offset(0.0, 0.0));
+    _textPainter.paint(_canvas, const Offset(0.0, 0.0));
 
     final _picture = _pictureRecorder.endRecording();
     final _image = await _picture.toImage(48, 48);

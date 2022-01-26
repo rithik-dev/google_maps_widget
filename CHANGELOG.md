@@ -1,3 +1,10 @@
+## [1.0.0] - 26/01/2022
+
+* Added linter and updated code accordingly
+* Updated dependencies
+* Removed unused dependencies
+* Updated README.md
+
 ## [0.0.9] - 06/10/2021
 
 * Fixed issue #2
