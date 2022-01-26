@@ -1,4 +1,4 @@
-# GoogleMapsWidget For Flutter
+# [GoogleMapsWidget](https://pub.dev/packages/google_maps_widget) For Flutter
 [![pub package](https://img.shields.io/pub/v/google_maps_widget.svg)](https://pub.dev/packages/google_maps_widget)
 [![likes](https://badges.bar/google_maps_widget/likes)](https://pub.dev/packages/google_maps_widget/score)
 [![popularity](https://badges.bar/google_maps_widget/popularity)](https://pub.dev/packages/google_maps_widget/score)
