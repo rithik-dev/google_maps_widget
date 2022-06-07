@@ -61,7 +61,7 @@ class Direction {
   /// Takes in an [encoded] polyline string from the
   /// api response and parses the given string in a [List] of [LatLng].
   static List<LatLng> _decodePolyline(String encoded) {
-    List<LatLng> _polyLines = [];
+    List<LatLng> polyLines = [];
     int index = 0, len = encoded.length;
     int lat = 0, lng = 0;
 
@@ -85,9 +85,9 @@ class Direction {
       int dLng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
       lng += dLng;
       final p = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
-      _polyLines.add(p);
+      polyLines.add(p);
     }
-    return _polyLines;
+    return polyLines;
   }
 
   /// Private constructor for [Direction] which receives a map from the

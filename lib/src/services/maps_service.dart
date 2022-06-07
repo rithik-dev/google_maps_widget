@@ -130,8 +130,8 @@ class MapsService {
   Set<Polyline> get polylines => _polylines;
 
   /// Sets [GoogleMapController] from [GoogleMap] callback to [_mapController].
-  void setController(GoogleMapController _controller) {
-    _mapController = _controller;
+  void setController(GoogleMapController controller) {
+    _mapController = controller;
   }
 
   /// Whether to show the source marker at [_sourceLatLng].
@@ -200,17 +200,17 @@ class MapsService {
       destination: _destinationLatLng,
     );
 
-    final _polylineCoordinates = <LatLng>[];
+    final polylineCoordinates = <LatLng>[];
 
     if (result != null && result.polylinePoints.isNotEmpty) {
-      _polylineCoordinates.addAll(result.polylinePoints);
+      polylineCoordinates.addAll(result.polylinePoints);
     }
 
     final polyline = Polyline(
       polylineId: const PolylineId("poly_line"),
       color: _routeColor ?? Constants.kRouteColor,
       width: _routeWidth ?? Constants.kRouteWidth,
-      points: _polylineCoordinates,
+      points: polylineCoordinates,
     );
 
     _polylines.add(polyline);

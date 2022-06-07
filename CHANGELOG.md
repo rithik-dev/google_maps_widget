@@ -1,3 +1,8 @@
+## [1.0.2] - 07/06/2022
+
+* Updated dependencies
+* Updated linter warnings
+
 ## [1.0.1] - 26/01/2022
 
 * Updated license

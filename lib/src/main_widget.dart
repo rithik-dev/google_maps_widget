@@ -343,6 +343,7 @@ class GoogleMapsWidget extends StatefulWidget {
   final CameraTargetBounds cameraTargetBounds;
 
   @override
+  // ignore: library_private_types_in_public_api
   _GoogleMapsWidgetState createState() => _GoogleMapsWidgetState();
 }
 

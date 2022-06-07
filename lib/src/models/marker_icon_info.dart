@@ -68,11 +68,11 @@ class MarkerIconInfo {
       targetHeight: size.height.toInt(),
     );
     FrameInfo fi = await codec.getNextFrame();
-    final _bytes = (await fi.image.toByteData(format: ImageByteFormat.png))!
+    final bytes = (await fi.image.toByteData(format: ImageByteFormat.png))!
         .buffer
         .asUint8List();
 
-    return BitmapDescriptor.fromBytes(_bytes);
+    return BitmapDescriptor.fromBytes(bytes);
   }
 
   /// Creates a [BitmapDescriptor] from a material [Icon].
@@ -80,13 +80,13 @@ class MarkerIconInfo {
     required Icon icon,
   }) async {
     final iconData = icon.icon!;
-    final _pictureRecorder = PictureRecorder();
-    final _canvas = Canvas(_pictureRecorder);
-    final _textPainter = TextPainter(textDirection: TextDirection.ltr);
-    final _iconStr = String.fromCharCode(iconData.codePoint);
+    final pictureRecorder = PictureRecorder();
+    final canvas = Canvas(pictureRecorder);
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+    final iconStr = String.fromCharCode(iconData.codePoint);
 
-    _textPainter.text = TextSpan(
-      text: _iconStr,
+    textPainter.text = TextSpan(
+      text: iconStr,
       style: TextStyle(
         letterSpacing: 0.0,
         fontSize: 48.0,
@@ -94,13 +94,13 @@ class MarkerIconInfo {
         color: icon.color,
       ),
     );
-    _textPainter.layout();
-    _textPainter.paint(_canvas, const Offset(0.0, 0.0));
+    textPainter.layout();
+    textPainter.paint(canvas, const Offset(0.0, 0.0));
 
-    final _picture = _pictureRecorder.endRecording();
-    final _image = await _picture.toImage(48, 48);
-    final _bytes = await _image.toByteData(format: ImageByteFormat.png);
+    final picture = pictureRecorder.endRecording();
+    final image = await picture.toImage(48, 48);
+    final bytes = await image.toByteData(format: ImageByteFormat.png);
 
-    return BitmapDescriptor.fromBytes(_bytes!.buffer.asUint8List());
+    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
   }
 }
