@@ -159,6 +159,9 @@ class MyApp extends StatelessWidget {
             driverMarkerIconInfo: MarkerIconInfo(
               assetPath: "assets/images/driver-marker-icon.png",
               assetMarkerSize: Size.square(125),
+              rotation: 15.0,
+              
+              // ... and more
             ),
             // mock stream
             driverCoordinatesStream: Stream.periodic(

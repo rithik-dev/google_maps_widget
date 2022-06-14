@@ -1,3 +1,8 @@
+## [1.0.3] - 14/06/2022
+
+* Added rotation and anchor to MarkerIconInfo
+* Updated README.md
+
 ## [1.0.2] - 07/06/2022
 
 * Updated dependencies
