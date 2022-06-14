@@ -16,6 +16,8 @@ class MarkerIconInfo {
     this.icon,
     this.assetPath,
     this.assetMarkerSize,
+    this.rotation = 0.0,
+    this.anchor = const Offset(0.5, 1.0),
   });
 
   /// Material icon that can be passed which can be used
@@ -30,6 +32,16 @@ class MarkerIconInfo {
   /// resize image at [assetPath].
   /// If null, defaults to [Constants.kDefaultMarkerSize].
   final Size? assetMarkerSize;
+
+  /// The icon image point that will be placed at the [position] of the marker.
+  ///
+  /// The image point is specified in normalized coordinates: An anchor of
+  /// (0.0, 0.0) means the top left corner of the image. An anchor
+  /// of (1.0, 1.0) means the bottom right corner of the image.
+  final Offset anchor;
+
+  /// Rotation of the marker image in degrees clockwise from the [anchor] point.
+  final double rotation;
 
   /// This getter is used to get the [BitmapDescriptor] required
   /// by the [Marker].
