@@ -162,7 +162,9 @@ class MapsService {
         Marker(
           markerId: const MarkerId("source"),
           position: _sourceLatLng,
-          icon: (await _sourceMarkerIconInfo?.bitmapDescriptor)!,
+          anchor: _sourceMarkerIconInfo!.anchor,
+          rotation: _sourceMarkerIconInfo!.rotation,
+          icon: await _sourceMarkerIconInfo!.bitmapDescriptor,
           onTap: _onTapSourceMarker == null
               ? null
               : () => _onTapSourceMarker!(_sourceLatLng),
@@ -177,7 +179,9 @@ class MapsService {
         Marker(
           markerId: const MarkerId("destination"),
           position: _destinationLatLng,
-          icon: (await _destinationMarkerIconInfo?.bitmapDescriptor)!,
+          anchor: _destinationMarkerIconInfo!.anchor,
+          rotation: _destinationMarkerIconInfo!.rotation,
+          icon: await _destinationMarkerIconInfo!.bitmapDescriptor,
           onTap: _onTapDestinationMarker == null
               ? null
               : () => _onTapDestinationMarker!(_destinationLatLng),
@@ -239,7 +243,7 @@ class MapsService {
   /// and renders [_driverMarkerIconInfo] marker to show
   /// driver's location in realtime.
   Future<void> _listenToDriverCoordinates(Stream<LatLng> coordinates) async {
-    final driverMarker = (await _driverMarkerIconInfo?.bitmapDescriptor)!;
+    final driverMarker = await _driverMarkerIconInfo!.bitmapDescriptor;
 
     _driverCoordinates = coordinates.listen((coordinate) {
       if (!_showDriverMarker) return;
@@ -252,6 +256,8 @@ class MapsService {
         Marker(
           markerId: const MarkerId('driver'),
           position: coordinate,
+          anchor: _driverMarkerIconInfo!.anchor,
+          rotation: _driverMarkerIconInfo!.rotation,
           icon: driverMarker,
           onTap: _onTapDriverMarker == null
               ? null
@@ -318,9 +324,10 @@ class MapsService {
     _totalDistanceCallback = totalDistanceCallback;
     _routeColor = routeColor;
     _routeWidth = routeWidth;
-    _sourceMarkerIconInfo = sourceMarkerIconInfo;
-    _destinationMarkerIconInfo = destinationMarkerIconInfo;
-    _driverMarkerIconInfo = driverMarkerIconInfo;
+    _sourceMarkerIconInfo = sourceMarkerIconInfo ?? const MarkerIconInfo();
+    _destinationMarkerIconInfo =
+        destinationMarkerIconInfo ?? const MarkerIconInfo();
+    _driverMarkerIconInfo = driverMarkerIconInfo ?? const MarkerIconInfo();
     _showSourceMarker = showSourceMarker;
     _showDestinationMarker = showDestinationMarker;
     _showDriverMarker = showDriverMarker;
