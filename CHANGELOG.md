@@ -1,3 +1,10 @@
+## [1.0.4] - 15/06/2022
+
+* Added updatePolylinesOnDriverLocUpdate to update directions based on current driver location
+* Updated dependencies
+* Updated example app
+* Updated README.md
+
 ## [1.0.3] - 14/06/2022
 
 * Added rotation and anchor to MarkerIconInfo

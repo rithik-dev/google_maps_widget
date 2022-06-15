@@ -20,6 +20,12 @@ class MapsService {
   /// destination [LatLng]
   late LatLng _destinationLatLng;
 
+  /// If true, Updates the polylines everytime a new event is pushed to
+  /// the driver stream, i.e. the driver location changes..
+  ///
+  /// Valid only if [GoogleMapsWidget.driverCoordinatesStream] is not null.
+  late bool _updatePolylinesOnDriverLocUpdate;
+
   /// Google maps controller
   GoogleMapController? _mapController;
 
@@ -198,9 +204,9 @@ class MapsService {
   }
 
   /// Build polylines from [_sourceLatLng] to [_destinationLatLng].
-  Future<void> _buildPolyLines() async {
+  Future<void> _buildPolyLines({LatLng? driverLoc}) async {
     final result = await Direction.getDirections(
-      origin: _sourceLatLng,
+      origin: driverLoc ?? _sourceLatLng,
       destination: _destinationLatLng,
     );
 
@@ -217,12 +223,13 @@ class MapsService {
       points: polylineCoordinates,
     );
 
+    if (driverLoc != null) _polylines.clear();
     _polylines.add(polyline);
 
     // setting map such as both source and
     // destinations markers can be seen
     if (result != null) {
-      await _mapController?.animateCamera(
+      _mapController?.animateCamera(
         CameraUpdate.newLatLngBounds(result.bounds, 32),
       );
 
@@ -246,6 +253,10 @@ class MapsService {
     final driverMarker = await _driverMarkerIconInfo!.bitmapDescriptor;
 
     _driverCoordinates = coordinates.listen((coordinate) {
+      if (_updatePolylinesOnDriverLocUpdate) {
+        _buildPolyLines(driverLoc: coordinate);
+      }
+
       if (!_showDriverMarker) return;
 
       _markers.removeWhere(
@@ -290,6 +301,7 @@ class MapsService {
     void Function(String?)? totalTimeCallback,
     void Function(String?)? totalDistanceCallback,
     Stream<LatLng>? driverCoordinatesStream,
+    bool updatePolylinesOnDriverLocUpdate = true,
     LatLng? defaultCameraLocation,
     double? defaultCameraZoom,
     String? sourceName,
@@ -324,6 +336,7 @@ class MapsService {
     _totalDistanceCallback = totalDistanceCallback;
     _routeColor = routeColor;
     _routeWidth = routeWidth;
+    _updatePolylinesOnDriverLocUpdate = updatePolylinesOnDriverLocUpdate;
     _sourceMarkerIconInfo = sourceMarkerIconInfo ?? const MarkerIconInfo();
     _destinationMarkerIconInfo =
         destinationMarkerIconInfo ?? const MarkerIconInfo();

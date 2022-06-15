@@ -43,6 +43,7 @@ class GoogleMapsWidget extends StatefulWidget {
     this.driverName = Constants.kDefaultDriverName,
     this.routeColor = Constants.kRouteColor,
     this.routeWidth = Constants.kRouteWidth,
+    this.updatePolylinesOnDriverLocUpdate = true,
 
     // other google maps params
     this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
@@ -99,6 +100,12 @@ class GoogleMapsWidget extends StatefulWidget {
 
   /// Called every time driver [Marker] is tapped.
   final void Function(LatLng)? onTapDriverMarker;
+
+  /// If true, Updates the polylines everytime a new event is pushed to
+  /// the driver stream, i.e. the driver location changes..
+  ///
+  /// Valid only if [GoogleMapsWidget.driverCoordinatesStream] is not null.
+  final bool updatePolylinesOnDriverLocUpdate;
 
   /// Called after polylines are created for the given
   /// [sourceLatLng] and [destinationLatLng] and
@@ -364,6 +371,7 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
       onTapDestinationInfoWindow: widget.onTapDestinationInfoWindow,
       onTapDriverInfoWindow: widget.onTapDriverInfoWindow,
       driverCoordinatesStream: widget.driverCoordinatesStream,
+      updatePolylinesOnDriverLocUpdate: widget.updatePolylinesOnDriverLocUpdate,
       sourceName: widget.sourceName,
       destinationName: widget.destinationName,
       driverName: widget.driverName,

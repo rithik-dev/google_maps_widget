@@ -30,7 +30,9 @@ class MyApp extends StatelessWidget {
             driverMarkerIconInfo: MarkerIconInfo(
               assetPath: "assets/images/driver-marker-icon.png",
               assetMarkerSize: Size.square(125),
+              rotation: 90,
             ),
+            updatePolylinesOnDriverLocUpdate: true,
             // mock stream
             driverCoordinatesStream: Stream.periodic(
               Duration(milliseconds: 500),

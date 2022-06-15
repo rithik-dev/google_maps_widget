@@ -171,6 +171,7 @@ class MyApp extends StatelessWidget {
                 -3.368043154478073 - i / 10000,
               ),
             ),
+            updatePolylinesOnDriverLocUpdate: true,
             sourceName: "This is source name",
             driverName: "Alex",
             onTapDriverMarker: (currentLocation) {
