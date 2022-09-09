@@ -357,8 +357,7 @@ class GoogleMapsWidget extends StatefulWidget {
 class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
   final _mapsService = MapsService();
 
-  @override
-  void initState() {
+  void _initialize() {
     _mapsService.initialize(
       setState: setState,
       apiKey: widget.apiKey,
@@ -389,7 +388,6 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
       showDriverMarker: widget.showDriverMarker,
       showPolyline: widget.showPolyline,
     );
-    super.initState();
   }
 
   @override
@@ -409,6 +407,7 @@ class _GoogleMapsWidgetState extends State<GoogleMapsWidget> {
       polylines: {..._mapsService.polylines, ...widget.polylines},
       onMapCreated: (controller) {
         _mapsService.setController(controller);
+        _initialize();
         if (widget.onMapCreated != null) {
           return widget.onMapCreated!(controller);
         }
