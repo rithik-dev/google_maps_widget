@@ -23,24 +23,12 @@ class GoogleMapsWidget extends StatefulWidget {
     this.sourceMarkerIconInfo = const MarkerIconInfo(),
     this.destinationMarkerIconInfo = const MarkerIconInfo(),
     this.driverMarkerIconInfo = const MarkerIconInfo(),
-    this.onTapSourceMarker,
-    this.onTapDestinationMarker,
-    this.onTapDriverMarker,
-    this.onTapSourceInfoWindow,
-    this.onTapDestinationInfoWindow,
-    this.onTapDriverInfoWindow,
     this.driverCoordinatesStream,
     this.defaultCameraLocation,
     this.markers = const <Marker>{},
     this.polylines = const <Polyline>{},
     this.showPolyline = true,
-    this.showSourceMarker = true,
-    this.showDestinationMarker = true,
-    this.showDriverMarker = true,
     this.defaultCameraZoom = Constants.kDefaultCameraZoom,
-    this.sourceName = Constants.kDefaultSourceName,
-    this.destinationName = Constants.kDefaultDestinationName,
-    this.driverName = Constants.kDefaultDriverName,
     this.routeColor = Constants.kRouteColor,
     this.routeWidth = Constants.kRouteWidth,
     this.updatePolylinesOnDriverLocUpdate = true,
@@ -84,24 +72,6 @@ class GoogleMapsWidget extends StatefulWidget {
   /// The destination [LatLng].
   final LatLng destinationLatLng;
 
-  /// Called every time source [Marker]'s [InfoWindow] is tapped.
-  final void Function(LatLng)? onTapSourceInfoWindow;
-
-  /// Called every time destination [Marker]'s [InfoWindow] is tapped.
-  final void Function(LatLng)? onTapDestinationInfoWindow;
-
-  /// Called every time driver [Marker]'s [InfoWindow] is tapped.
-  final void Function(LatLng)? onTapDriverInfoWindow;
-
-  /// Called every time source [Marker] is tapped.
-  final void Function(LatLng)? onTapSourceMarker;
-
-  /// Called every time destination [Marker] is tapped.
-  final void Function(LatLng)? onTapDestinationMarker;
-
-  /// Called every time driver [Marker] is tapped.
-  final void Function(LatLng)? onTapDriverMarker;
-
   /// If true, Updates the polylines everytime a new event is pushed to
   /// the driver stream, i.e. the driver location changes..
   ///
@@ -138,21 +108,6 @@ class GoogleMapsWidget extends StatefulWidget {
   /// Defaults to [Constants.kDefaultCameraZoom].
   final double defaultCameraZoom;
 
-  /// Displays source [Marker]'s [InfoWindow] displaying [sourceName]
-  /// when tapped on [sourceMarkerIconInfo].
-  /// Defaults to [Constants.kDefaultSourceName].
-  final String sourceName;
-
-  /// Displays destination [Marker]'s [InfoWindow] displaying [destinationName]
-  /// when tapped on [destinationMarkerIconInfo].
-  /// Defaults to [Constants.kDefaultDestinationName].
-  final String destinationName;
-
-  /// Displays driver's [Marker]'s [InfoWindow] displaying [driverName]
-  /// when tapped on [driverMarkerIconInfo].
-  /// Defaults to [Constants.kDefaultDriverName].
-  final String driverName;
-
   /// Color of the route made between [sourceLatLng] and [destinationLatLng].
   /// Defaults to [Constants.kRouteColor].
   final Color routeColor;
@@ -173,21 +128,6 @@ class GoogleMapsWidget extends StatefulWidget {
   /// See also:
   ///   * [driverCoordinatesStream] parameter.
   final MarkerIconInfo driverMarkerIconInfo;
-
-  /// Whether to show the source marker at [sourceLatLng].
-  ///
-  /// Defaults to true.
-  final bool showSourceMarker;
-
-  /// Whether to show the destination marker at [destinationLatLng].
-  ///
-  /// Defaults to true.
-  final bool showDestinationMarker;
-
-  /// Whether to show the driver marker.
-  ///
-  /// Defaults to true.
-  final bool showDriverMarker;
 
   /// Whether to show the generated polyline from [sourceLatLng]
   /// to [destinationLatLng].
@@ -372,7 +312,7 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
   Future<GoogleMapController> getGoogleMapsController() =>
       _mapsControllerCompleter.future;
 
-  void setSourceLatLng(LatLng sourceLatLng) async {
+  Future<void> setSourceLatLng(LatLng sourceLatLng) async {
     if (_sourceLatLng == sourceLatLng) return;
 
     _sourceLatLng = sourceLatLng;
@@ -381,7 +321,7 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
     setState(() {});
   }
 
-  void setDestinationLatLng(LatLng destinationLatLng) async {
+  Future<void> setDestinationLatLng(LatLng destinationLatLng) async {
     if (_destinationLatLng == destinationLatLng) return;
 
     _destinationLatLng = destinationLatLng;
@@ -399,42 +339,44 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
   void _setSourceDestinationMarkers() async {
     _markersMap.remove(MarkerIconInfo.sourceMarkerId);
 
-    if (widget.showSourceMarker) {
+    final sourceMarker = widget.sourceMarkerIconInfo;
+    if (sourceMarker.isVisible) {
       _markersMap[MarkerIconInfo.sourceMarkerId] = Marker(
         markerId: MarkerIconInfo.sourceMarkerId,
         position: _sourceLatLng,
-        anchor: widget.sourceMarkerIconInfo.anchor,
-        rotation: widget.sourceMarkerIconInfo.rotation,
-        icon: await widget.sourceMarkerIconInfo.bitmapDescriptor,
-        onTap: widget.onTapSourceMarker == null
+        anchor: sourceMarker.anchor,
+        rotation: sourceMarker.rotation,
+        icon: await sourceMarker.bitmapDescriptor,
+        onTap: sourceMarker.onTapMarker == null
             ? null
-            : () => widget.onTapSourceMarker!(_sourceLatLng),
+            : () => sourceMarker.onTapMarker!(_sourceLatLng),
         infoWindow: InfoWindow(
-          onTap: widget.onTapSourceInfoWindow == null
+          onTap: sourceMarker.onTapInfoWindow == null
               ? null
-              : () => widget.onTapSourceInfoWindow!(_sourceLatLng),
-          title: widget.sourceName,
+              : () => sourceMarker.onTapInfoWindow!(_sourceLatLng),
+          title: sourceMarker.infoWindowTitle,
         ),
       );
     }
 
     _markersMap.remove(MarkerIconInfo.destinationMarkerId);
 
-    if (widget.showDestinationMarker) {
+    final destinationMarker = widget.destinationMarkerIconInfo;
+    if (destinationMarker.isVisible) {
       _markersMap[MarkerIconInfo.destinationMarkerId] = Marker(
         markerId: MarkerIconInfo.destinationMarkerId,
         position: _destinationLatLng,
-        anchor: widget.destinationMarkerIconInfo.anchor,
-        rotation: widget.destinationMarkerIconInfo.rotation,
-        icon: await widget.destinationMarkerIconInfo.bitmapDescriptor,
-        onTap: widget.onTapDestinationMarker == null
+        anchor: destinationMarker.anchor,
+        rotation: destinationMarker.rotation,
+        icon: await destinationMarker.bitmapDescriptor,
+        onTap: destinationMarker.onTapMarker == null
             ? null
-            : () => widget.onTapDestinationMarker!(_destinationLatLng),
+            : () => destinationMarker.onTapMarker!(_destinationLatLng),
         infoWindow: InfoWindow(
-          onTap: widget.onTapDestinationInfoWindow == null
+          onTap: destinationMarker.onTapInfoWindow == null
               ? null
-              : () => widget.onTapDestinationInfoWindow!(_destinationLatLng),
-          title: widget.destinationName,
+              : () => destinationMarker.onTapInfoWindow!(_destinationLatLng),
+          title: destinationMarker.infoWindowTitle,
         ),
       );
     }
@@ -459,7 +401,7 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
     }
 
     final polyline = Polyline(
-      polylineId: const PolylineId("poly_line"),
+      polylineId: const PolylineId('default-polyline'),
       color: widget.routeColor,
       width: widget.routeWidth,
       points: polylineCoordinates,
@@ -492,31 +434,33 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
     final driverStream = widget.driverCoordinatesStream;
     if (driverStream == null) return;
 
-    final driverMarker = await widget.driverMarkerIconInfo.bitmapDescriptor;
+    final driverMarkerBitmapDescriptor =
+        await widget.driverMarkerIconInfo.bitmapDescriptor;
 
     _driverCoordinatesStreamSubscription = driverStream.listen((coordinate) {
       if (widget.updatePolylinesOnDriverLocUpdate) {
         _buildPolyLines(driverLoc: coordinate);
       }
 
-      if (!widget.showDriverMarker) return;
+      if (!widget.driverMarkerIconInfo.isVisible) return;
 
       _markersMap.remove(MarkerIconInfo.driverMarkerId);
 
+      final driverMarker = widget.driverMarkerIconInfo;
       _markersMap[MarkerIconInfo.driverMarkerId] = Marker(
         markerId: MarkerIconInfo.driverMarkerId,
         position: coordinate,
-        anchor: widget.driverMarkerIconInfo.anchor,
-        rotation: widget.driverMarkerIconInfo.rotation,
-        icon: driverMarker,
-        onTap: widget.onTapDriverMarker == null
+        anchor: driverMarker.anchor,
+        rotation: driverMarker.rotation,
+        icon: driverMarkerBitmapDescriptor,
+        onTap: driverMarker.onTapMarker == null
             ? null
-            : () => widget.onTapDriverMarker!(coordinate),
+            : () => driverMarker.onTapMarker!(coordinate),
         infoWindow: InfoWindow(
-          onTap: widget.onTapDriverInfoWindow == null
+          onTap: driverMarker.onTapInfoWindow == null
               ? null
-              : () => widget.onTapDriverInfoWindow!(coordinate),
-          title: widget.driverName,
+              : () => driverMarker.onTapInfoWindow!(coordinate),
+          title: driverMarker.infoWindowTitle,
         ),
       );
 

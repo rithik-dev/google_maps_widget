@@ -39,13 +39,21 @@ class MyApp extends StatelessWidget {
 
                   routeWidth: 2,
                   sourceMarkerIconInfo: MarkerIconInfo(
+                    infoWindowTitle: "This is source name",
+                    onTapInfoWindow: (_) {
+                      print("Tapped on source info window");
+                    },
                     assetPath: "assets/images/house-marker-icon.png",
                   ),
                   destinationMarkerIconInfo: MarkerIconInfo(
                     assetPath: "assets/images/restaurant-marker-icon.png",
                   ),
                   driverMarkerIconInfo: MarkerIconInfo(
+                    infoWindowTitle: "Alex",
                     assetPath: "assets/images/driver-marker-icon.png",
+                    onTapMarker: (currentLocation) {
+                      print("Driver is currently at $currentLocation");
+                    },
                     assetMarkerSize: Size.square(125),
                     rotation: 90,
                   ),
@@ -58,11 +66,6 @@ class MyApp extends StatelessWidget {
                       -3.368043154478073 - i / 10000,
                     ),
                   ),
-                  sourceName: "This is source name",
-                  driverName: "Alex",
-                  onTapDriverMarker: (currentLocation) {
-                    print("Driver is currently at $currentLocation");
-                  },
                   totalTimeCallback: (time) => print(time),
                   totalDistanceCallback: (distance) => print(distance),
                 ),

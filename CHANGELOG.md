@@ -1,8 +1,9 @@
 ## [1.0.5] - 25/10/2022
 
+* BREAKING: `MarkerIconInfo` inputs are now non-nullable
+* BREAKING: Added properties `onTapMarker`, `onTapInfoWindow`, `infoWindowTitle` and `isVisible` to `MarkerIconInfo`, and removed corresponding params for source, destination, driver from `GoogleMapsWidget`
 * Changed internal implementation of the widget
 * Added `layoutDirection` property
-* `MarkerIconInfo` inputs are now non-nullable
 * Exposed state class to allow updating source/destination lat lng, or interacting with google maps con directly
 * Updated a dependency to the latest release
 * Updated example app
