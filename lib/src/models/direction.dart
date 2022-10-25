@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_widget/src/services/maps_service.dart';
 
 /// A class containing information required by [GoogleMap] to
 /// draw polylines on the map widget.
@@ -31,18 +30,19 @@ class Direction {
   static const String _baseUrl =
       'https://maps.googleapis.com/maps/api/directions/json?';
 
-  /// Receives [origin] and [destination] coordinates and calls
-  /// the Google Maps API.
+  /// Receives [origin], [destination], [googleMapsApiKey] coordinates
+  /// and calls the Google Maps API.
   static Future<Direction?> getDirections({
+    required String googleMapsApiKey,
     required LatLng origin,
     required LatLng destination,
   }) async {
     final response = await Dio().get(
       _baseUrl,
       queryParameters: {
+        'key': googleMapsApiKey,
         'origin': '${origin.latitude},${origin.longitude}',
         'destination': '${destination.latitude},${destination.longitude}',
-        'key': MapsService.apiKey,
       },
     );
 

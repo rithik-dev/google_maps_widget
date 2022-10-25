@@ -125,6 +125,30 @@ GoogleMapsWidget(
 ),
 ```
 
+One can create a controller and interact with the google maps controller, or update the source and destination LatLng's.
+```dart
+// can create a controller, and call methods to update source loc,
+// destination loc, interact with the google maps controller to
+// show/hide markers programmatically etc.
+final mapsWidgetController = GlobalKey<GoogleMapsWidgetState>();
+```
+Pass this controller to the `key` param in `GoogleMapsWidget` widget, and then
+```dart
+
+// call like this to update source or destination, this will also rebuild the route.
+mapsWidgetController.currentState!.setSourceLatLng(
+  LatLng(
+    40.484000837597925 * (Random().nextDouble()),
+    -3.369978368282318,
+  ),
+);
+
+// or, can interact with the google maps controller directly to focus on a marker etc..
+
+final googleMapsCon = await mapsWidgetController.currentState!.getGoogleMapsController();
+googleMapsCon.showMarkerInfoWindow(MarkerIconInfo.sourceMarkerId);
+```
+
 Sample Usage
 ```dart
 import 'package:flutter/material.dart';

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_widget/google_maps_widget.dart';
-import 'package:google_maps_widget/src/services/maps_service.dart';
 
-/// Defines all the constants used by [GoogleMapsWidget] & [MapsService].
+/// Defines all the constants used by [GoogleMapsWidget].
 class Constants {
   Constants._();
 

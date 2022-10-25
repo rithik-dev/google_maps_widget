@@ -20,6 +20,10 @@ class MarkerIconInfo {
     this.anchor = const Offset(0.5, 1.0),
   });
 
+  static const sourceMarkerId = MarkerId('source');
+  static const destinationMarkerId = MarkerId('destination');
+  static const driverMarkerId = MarkerId('driver');
+
   /// Material icon that can be passed which can be used
   /// in place of a default [Marker].
   final Icon? icon;
