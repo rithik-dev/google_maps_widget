@@ -6,7 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_widget/src/utils/constants.dart';
 
 /// Class used to provide information about the marker on the [GoogleMap] widget.
-/// Pass either an asset image [assetPath] or a material [icon].
+/// Pass either an asset image [assetPath] or a material [icon] to change the appearance of the icon.
 /// [assetMarkerSize] can be provided to resize image at [assetPath].
 ///
 /// See also:
@@ -16,9 +16,17 @@ class MarkerIconInfo {
     this.icon,
     this.assetPath,
     this.assetMarkerSize,
+    this.onTapMarker,
+    this.onTapInfoWindow,
+    this.infoWindowTitle,
+    this.isVisible = true,
     this.rotation = 0.0,
     this.anchor = const Offset(0.5, 1.0),
   });
+
+  static const sourceMarkerId = MarkerId('source');
+  static const destinationMarkerId = MarkerId('destination');
+  static const driverMarkerId = MarkerId('driver');
 
   /// Material icon that can be passed which can be used
   /// in place of a default [Marker].
@@ -42,6 +50,25 @@ class MarkerIconInfo {
 
   /// Rotation of the marker image in degrees clockwise from the [anchor] point.
   final double rotation;
+
+  /// Displays [Marker]'s [InfoWindow] displaying [infoWindowTitle]
+  /// when tapped on [MarkerIconInfo].
+  ///
+  /// The info window is not rendered if [infoWindowTitle] is null.
+  ///
+  /// Defaults to null.
+  final String? infoWindowTitle;
+
+  /// Whether to show the marker or the map or not.
+  ///
+  /// Defaults to true.
+  final bool isVisible;
+
+  /// Called every time the [Marker] is tapped.
+  final void Function(LatLng)? onTapMarker;
+
+  /// Called every time the [InfoWindow] is tapped.
+  final void Function(LatLng)? onTapInfoWindow;
 
   /// This getter is used to get the [BitmapDescriptor] required
   /// by the [Marker].
