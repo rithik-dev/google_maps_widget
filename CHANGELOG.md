@@ -1,3 +1,7 @@
+## [1.0.5] - 29/09/2022
+
+* Updated a dependency to the latest release
+
 ## [1.0.4] - 15/06/2022
 
 * Added updatePolylinesOnDriverLocUpdate to update directions based on current driver location
