@@ -1,3 +1,7 @@
+## [1.0.5+1] - 25/10/2022
+
+* Updated README.md
+
 ## [1.0.5] - 25/10/2022
 
 * BREAKING: `MarkerIconInfo` inputs are now non-nullable

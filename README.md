@@ -84,7 +84,7 @@ import GoogleMaps
   }
 }
 ```
-### Web
+### Web (This package is a wrapper around the `google_maps_flutter` package. If that package supports web, this package will also support web.)
 
 Modify web/index.html
 
