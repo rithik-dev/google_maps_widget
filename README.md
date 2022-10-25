@@ -211,6 +211,9 @@ class MyApp extends StatelessWidget {
                     rotation: 90,
                   ),
                   updatePolylinesOnDriverLocUpdate: true,
+                  onPolylineUpdate: (_) {
+                    print("Polyline updated");
+                  },
                   // mock stream
                   driverCoordinatesStream: Stream.periodic(
                     Duration(milliseconds: 500),

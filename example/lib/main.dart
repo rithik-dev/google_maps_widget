@@ -57,6 +57,9 @@ class MyApp extends StatelessWidget {
                     assetMarkerSize: Size.square(125),
                     rotation: 90,
                   ),
+                  onPolylineUpdate: (p) {
+                    print("Polyline updated: ${p.points}");
+                  },
                   updatePolylinesOnDriverLocUpdate: true,
                   // mock stream
                   driverCoordinatesStream: Stream.periodic(

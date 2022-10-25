@@ -25,6 +25,7 @@ class GoogleMapsWidget extends StatefulWidget {
     this.driverMarkerIconInfo = const MarkerIconInfo(),
     this.driverCoordinatesStream,
     this.defaultCameraLocation,
+    this.onPolylineUpdate,
     this.markers = const <Marker>{},
     this.polylines = const <Polyline>{},
     this.showPolyline = true,
@@ -115,6 +116,9 @@ class GoogleMapsWidget extends StatefulWidget {
   /// Width of the route made between [sourceLatLng] and [destinationLatLng].
   /// Defaults to [Constants.kRouteWidth].
   final int routeWidth;
+
+  /// Called when the polyline is updated i.e. route is updated.
+  final void Function(Polyline)? onPolylineUpdate;
 
   /// The marker which is rendered on the location [sourceLatLng].
   final MarkerIconInfo sourceMarkerIconInfo;
@@ -406,6 +410,8 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
       width: widget.routeWidth,
       points: polylineCoordinates,
     );
+
+    widget.onPolylineUpdate?.call(polyline);
 
     if (driverLoc != null) _polylines.clear();
     _polylines.add(polyline);
