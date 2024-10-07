@@ -13,7 +13,7 @@ import 'package:google_maps_widget/src/utils/constants.dart';
 /// and also handle a driver's realtime location (if any) on the map.
 class GoogleMapsWidget extends StatefulWidget {
   const GoogleMapsWidget({
-    Key? key,
+    super.key,
     required this.apiKey,
     required this.sourceLatLng,
     required this.destinationLatLng,
@@ -62,7 +62,7 @@ class GoogleMapsWidget extends StatefulWidget {
     this.onCameraIdle,
     this.onTap,
     this.onLongPress,
-  }) : super(key: key);
+  });
 
   /// Google Maps API Key.
   final String apiKey;

@@ -111,7 +111,7 @@ class MarkerIconInfo {
         .buffer
         .asUint8List();
 
-    return BitmapDescriptor.fromBytes(bytes);
+    return BitmapDescriptor.bytes(bytes);
   }
 
   /// Creates a [BitmapDescriptor] from a material [Icon].
@@ -140,6 +140,6 @@ class MarkerIconInfo {
     final image = await picture.toImage(48, 48);
     final bytes = await image.toByteData(format: ImageByteFormat.png);
 
-    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+    return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
   }
 }
