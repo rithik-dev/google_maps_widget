@@ -1,11 +1,12 @@
 name: google_maps_widget_demo
-description: A new Flutter application to show the demo for google_maps_widget package.
-version: 1.0.0+1
+description: "A new Flutter application to show the demo for google_maps_widget package."
 
 publish_to: 'none'
 
+version: 1.0.0+1
+
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ^3.5.3
 
 dependencies:
   flutter:
@@ -15,8 +16,7 @@ dependencies:
     path: "../"
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true

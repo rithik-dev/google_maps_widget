@@ -8,6 +8,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  MyApp({super.key});
+
   // can create a controller, and call methods to update source loc,
   // destination loc, interact with the google maps controller to
   // show/hide markers programmatically etc.
@@ -41,7 +43,7 @@ class MyApp extends StatelessWidget {
                   sourceMarkerIconInfo: MarkerIconInfo(
                     infoWindowTitle: "This is source name",
                     onTapInfoWindow: (_) {
-                      print("Tapped on source info window");
+                      debugPrint("Tapped on source info window");
                     },
                     assetPath: "assets/images/house-marker-icon.png",
                   ),
@@ -52,13 +54,13 @@ class MyApp extends StatelessWidget {
                     infoWindowTitle: "Alex",
                     assetPath: "assets/images/driver-marker-icon.png",
                     onTapMarker: (currentLocation) {
-                      print("Driver is currently at $currentLocation");
+                      debugPrint("Driver is currently at $currentLocation");
                     },
                     assetMarkerSize: Size.square(125),
                     rotation: 90,
                   ),
                   onPolylineUpdate: (p) {
-                    print("Polyline updated: ${p.points}");
+                    debugPrint("Polyline updated: ${p.points}");
                   },
                   updatePolylinesOnDriverLocUpdate: true,
                   // mock stream
@@ -69,8 +71,8 @@ class MyApp extends StatelessWidget {
                       -3.368043154478073 - i / 10000,
                     ),
                   ),
-                  totalTimeCallback: (time) => print(time),
-                  totalDistanceCallback: (distance) => print(distance),
+                  totalTimeCallback: (time) => debugPrint(time),
+                  totalDistanceCallback: (distance) => debugPrint(distance),
                 ),
               ),
               // demonstrates how to interact with the controller
