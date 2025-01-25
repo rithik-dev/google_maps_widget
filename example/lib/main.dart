@@ -46,9 +46,11 @@ class MyApp extends StatelessWidget {
                       debugPrint("Tapped on source info window");
                     },
                     assetPath: "assets/images/house-marker-icon.png",
+                    assetMarkerSize: Size.square(50),
                   ),
                   destinationMarkerIconInfo: MarkerIconInfo(
                     assetPath: "assets/images/restaurant-marker-icon.png",
+                    assetMarkerSize: Size.square(50),
                   ),
                   driverMarkerIconInfo: MarkerIconInfo(
                     infoWindowTitle: "Alex",
@@ -56,7 +58,7 @@ class MyApp extends StatelessWidget {
                     onTapMarker: (currentLocation) {
                       debugPrint("Driver is currently at $currentLocation");
                     },
-                    assetMarkerSize: Size.square(125),
+                    assetMarkerSize: Size.square(50),
                     rotation: 90,
                   ),
                   onPolylineUpdate: (p) {
