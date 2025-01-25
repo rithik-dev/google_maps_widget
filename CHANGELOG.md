@@ -1,3 +1,11 @@
+# [1.0.6]
+
+* FIX: Bug where `assetMarkerSize` in `MarkerIconInfo`  does not apply if `icon` is passed. 
+* Fix Dart static analysis warnings
+* Updated README.md
+* Updated example app
+* Updated dependencies
+
 # [1.0.5+1]
 
 * Updated README.md
