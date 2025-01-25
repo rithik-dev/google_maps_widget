@@ -86,7 +86,12 @@ class MarkerIconInfo {
       );
     }
 
-    if (icon != null) return await _getMarkerFromMaterialIcon(icon: icon!);
+    if (icon != null) {
+      return await _getMarkerFromMaterialIcon(
+        icon: icon!,
+        size: assetMarkerSize ?? Constants.kDefaultMarkerSize,
+      );
+    }
 
     return BitmapDescriptor.defaultMarker;
   }
@@ -111,12 +116,17 @@ class MarkerIconInfo {
         .buffer
         .asUint8List();
 
-    return BitmapDescriptor.bytes(bytes);
+    return BitmapDescriptor.bytes(
+      bytes,
+      height: size.height,
+      width: size.width,
+    );
   }
 
   /// Creates a [BitmapDescriptor] from a material [Icon].
   static Future<BitmapDescriptor> _getMarkerFromMaterialIcon({
     required Icon icon,
+    required Size size,
   }) async {
     final iconData = icon.icon!;
     final pictureRecorder = PictureRecorder();
@@ -137,9 +147,16 @@ class MarkerIconInfo {
     textPainter.paint(canvas, const Offset(0.0, 0.0));
 
     final picture = pictureRecorder.endRecording();
-    final image = await picture.toImage(48, 48);
+    final image = await picture.toImage(
+      size.width.toInt(),
+      size.height.toInt(),
+    );
     final bytes = await image.toByteData(format: ImageByteFormat.png);
 
-    return BitmapDescriptor.bytes(bytes!.buffer.asUint8List());
+    return BitmapDescriptor.bytes(
+      bytes!.buffer.asUint8List(),
+      height: size.height,
+      width: size.width,
+    );
   }
 }
