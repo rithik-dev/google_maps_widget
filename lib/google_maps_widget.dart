@@ -1,4 +1,4 @@
-library google_maps_widget;
+library;
 
 export 'src/main_widget.dart';
 export 'src/models/marker_icon_info.dart';
