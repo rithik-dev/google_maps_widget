@@ -1,3 +1,7 @@
+## 1.0.7 - 2026-07-27
+
+* Added GitHub Actions CI to automate version bumps, changelog updates, tagging and pub.dev publishing.
+
 ## 1.0.6 - 2025-01-26
 
 * FIX: Bug where `assetMarkerSize` in `MarkerIconInfo`  does not apply if `icon` is passed. 
