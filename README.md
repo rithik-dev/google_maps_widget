@@ -188,8 +188,6 @@ googleMapsCon.showMarkerInfoWindow(MarkerIconInfo.sourceMarkerId);
 
 # 🎯 Sample Usage
 
-# FIXME
-
 See the [example](https://github.com/rithik-dev/google_maps_widget/blob/master/example) app for a complete app. Learn how to setup the example app for testing [here](https://github.com/rithik-dev/google_maps_widget/blob/master/example/README.md).
 
 Check out the full API reference of the widget [here](https://pub.dev/documentation/google_maps_widget/latest/google_maps_widget/GoogleMapsWidget-class.html).
