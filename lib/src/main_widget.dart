@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_widget/src/models/direction.dart';
+import 'package:google_maps_widget/src/models/route_details.dart';
 import 'package:google_maps_widget/src/models/marker_icon_info.dart';
 import 'package:google_maps_widget/src/utils/constants.dart';
 
@@ -20,6 +20,7 @@ class GoogleMapsWidget extends StatefulWidget {
     this.totalDistanceCallback,
     this.totalTimeCallback,
     this.onMapCreated,
+    this.onError,
     this.sourceMarkerIconInfo = const MarkerIconInfo(),
     this.destinationMarkerIconInfo = const MarkerIconInfo(),
     this.driverMarkerIconInfo = const MarkerIconInfo(),
@@ -33,6 +34,8 @@ class GoogleMapsWidget extends StatefulWidget {
     this.routeColor = Constants.kRouteColor,
     this.routeWidth = Constants.kRouteWidth,
     this.updatePolylinesOnDriverLocUpdate = true,
+    this.routesConnectTimeout = Constants.kRoutesConnectTimeout,
+    this.routesReceiveTimeout = Constants.kRoutesReceiveTimeout,
 
     // other google maps params
     this.gestureRecognizers = const <Factory<OneSequenceGestureRecognizer>>{},
@@ -50,7 +53,7 @@ class GoogleMapsWidget extends StatefulWidget {
     this.tiltGesturesEnabled = true,
     this.myLocationEnabled = false,
     this.myLocationButtonEnabled = true,
-    this.padding = const EdgeInsets.all(0),
+    this.padding = EdgeInsets.zero,
     this.indoorViewEnabled = false,
     this.trafficEnabled = false,
     this.buildingsEnabled = true,
@@ -62,15 +65,43 @@ class GoogleMapsWidget extends StatefulWidget {
     this.onCameraIdle,
     this.onTap,
     this.onLongPress,
+    this.style,
+    this.colorScheme,
+    this.clusterManagers = const <ClusterManager>{},
+    this.groundOverlays = const <GroundOverlay>{},
+    this.heatmaps = const <Heatmap>{},
+    this.markerType = GoogleMapMarkerType.marker,
+    this.fortyFiveDegreeImageryEnabled = false,
+    this.fullscreenControlEnabled = false,
+    this.mapTypeControlEnabled = false,
+    this.streetViewControlEnabled = false,
+    this.webCameraControlEnabled = true,
+    this.webCameraControlPosition,
+    this.webGestureHandling,
   });
 
-  /// Google Maps API Key.
+  /// Google Maps API key used for the Routes API call that builds the route.
+  ///
+  /// This is separate from the key the native Maps SDKs use to render tiles,
+  /// and it cannot carry an application restriction. Application restrictions
+  /// are enforced by the native SDKs, which attach the package name or bundle
+  /// id; this call is a plain HTTPS request and carries neither, so Google
+  /// answers PERMISSION_DENIED, reporting the blocked client application
+  /// as `<empty>`.
+  ///
+  /// Restrict this key by API instead, to the Routes API, and cap its quota.
   final String apiKey;
 
   /// The source [LatLng].
+  ///
+  /// Changing this and rebuilding the widget updates the source marker and
+  /// recalculates the route.
   final LatLng sourceLatLng;
 
   /// The destination [LatLng].
+  ///
+  /// Changing this and rebuilding the widget updates the destination marker
+  /// and recalculates the route.
   final LatLng destinationLatLng;
 
   /// If true, Updates the polylines everytime a new event is pushed to
@@ -79,24 +110,51 @@ class GoogleMapsWidget extends StatefulWidget {
   /// Valid only if [GoogleMapsWidget.driverCoordinatesStream] is not null.
   final bool updatePolylinesOnDriverLocUpdate;
 
-  /// Called after polylines are created for the given
-  /// [sourceLatLng] and [destinationLatLng] and
-  /// totalTime is initialized.
-  final void Function(String?)? totalTimeCallback;
+  /// Called with how long the route is expected to take, once it has been
+  /// computed for [sourceLatLng] and [destinationLatLng].
+  ///
+  /// The Routes API reports duration numerically, so this is a [Duration]
+  /// rather than the localized string the legacy Directions API returned.
+  final void Function(Duration)? totalTimeCallback;
 
-  /// Called after polylines are created for the given
-  /// [sourceLatLng] and [destinationLatLng] and
-  /// totalDistance is initialized.
-  final void Function(String?)? totalDistanceCallback;
+  /// Called with the length of the route in metres, once it has been computed
+  /// for [sourceLatLng] and [destinationLatLng].
+  ///
+  /// The Routes API reports distance numerically, so format this for display
+  /// yourself to match your app's locale.
+  final void Function(int)? totalDistanceCallback;
+
+  /// How long to wait to establish a connection to the Google Routes API
+  /// before giving up.
+  ///
+  /// Defaults to [Constants.kRoutesConnectTimeout]. Worth lowering on a live
+  /// driver stream, where a request that outlives the next location update is
+  /// already stale.
+  final Duration routesConnectTimeout;
+
+  /// How long to wait for the Google Routes API response once connected.
+  ///
+  /// Defaults to [Constants.kRoutesReceiveTimeout].
+  final Duration routesReceiveTimeout;
+
+  /// Called when the route could not be fetched from the Google Routes API,
+  /// with a [RoutesApiException] describing why.
+  ///
+  /// The most common causes are an API key without the Routes API enabled,
+  /// billing not being enabled on the Google Cloud project, or no network.
+  /// Without this callback they are easy to mistake for the map simply not
+  /// working.
+  ///
+  /// The map still renders when this fires; only the route is missing.
+  /// Errors are also logged to the console in debug builds.
+  final void Function(Object error, StackTrace stackTrace)? onError;
 
   /// A [Stream] of [LatLng] objects for the driver
   /// used to render [driverMarkerIconInfo] on the map
   /// with the provided [LatLng] objects.
   ///
   /// See also:
-  ///   * [onTapDriverInfoWindow] parameter.
-  ///   * [onTapDriverMarker] parameter.
-  ///   * [driverName] parameter.
+  ///   * [driverMarkerIconInfo] parameter.
   ///
   /// If null, the [driverMarkerIconInfo] is not rendered.
   final Stream<LatLng>? driverCoordinatesStream;
@@ -300,38 +358,103 @@ class GoogleMapsWidget extends StatefulWidget {
   /// Geographical bounding box for the camera target.
   final CameraTargetBounds cameraTargetBounds;
 
+  /// The style to apply to the map, as a Google Maps style JSON string.
+  ///
+  /// This is how a dark (or otherwise themed) map is applied. Pass the JSON
+  /// produced by https://mapstyle.withgoogle.com, switching the string when
+  /// the app's theme changes:
+  ///
+  /// ```dart
+  /// GoogleMapsWidget(
+  ///   style: Theme.of(context).brightness == Brightness.dark
+  ///       ? darkMapStyleJson
+  ///       : null,
+  ///   ...
+  /// )
+  /// ```
+  ///
+  /// See also:
+  ///   * [colorScheme] parameter, for switching between Google's own light
+  ///     and dark map styles without supplying a style JSON.
+  final String? style;
+
+  /// Whether the map should render in Google's light or dark color scheme,
+  /// or follow the platform's setting.
+  ///
+  /// Unlike [style], this can only be applied when the map is first created;
+  /// changing it later has no effect. Use [style] if the map has to follow a
+  /// theme toggle at runtime.
+  final MapColorScheme? colorScheme;
+
+  /// Cluster managers to be initialized for the map.
+  final Set<ClusterManager> clusterManagers;
+
+  /// Ground overlays to be placed on the map.
+  final Set<GroundOverlay> groundOverlays;
+
+  /// Heatmaps to show on the map.
+  final Set<Heatmap> heatmaps;
+
+  /// The type of marker rendering to use for the map.
+  final GoogleMapMarkerType markerType;
+
+  /// Whether 45 degree imagery should be enabled. Web only.
+  final bool fortyFiveDegreeImageryEnabled;
+
+  /// Whether the fullscreen control should be enabled. Web only.
+  final bool fullscreenControlEnabled;
+
+  /// Whether the map type control should be enabled. Web only.
+  final bool mapTypeControlEnabled;
+
+  /// Whether the street view control should be enabled. Web only.
+  final bool streetViewControlEnabled;
+
+  /// Whether the camera (zoom) control should be enabled. Web only.
+  final bool webCameraControlEnabled;
+
+  /// The position of the camera (zoom) control. Web only.
+  final WebCameraControlPosition? webCameraControlPosition;
+
+  /// How the map handles gestures relative to the surrounding page. Web only.
+  final WebGestureHandling? webGestureHandling;
+
   @override
   GoogleMapsWidgetState createState() => GoogleMapsWidgetState();
 }
 
 class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
-  /// Markers to be placed on the map.
+  /// The [PolylineId] of the route generated between the source and the
+  /// destination.
+  static const generatedPolylineId = PolylineId('default-polyline');
+
+  /// Markers to be placed on the map, keyed by id so that an update replaces
+  /// the previous marker rather than sitting alongside it.
   final _markersMap = <MarkerId, Marker>{};
 
   /// Polylines to be placed on the map.
-  final _polylines = <Polyline>{};
+  ///
+  /// Keyed by [PolylineId] for the same reason as [_markersMap]: a [Set] would
+  /// hold two polylines sharing an id, and google_maps_flutter keeps whichever
+  /// one it happens to see last, so a stale route could win.
+  final _polylines = <PolylineId, Polyline>{};
 
   final _mapsControllerCompleter = Completer<GoogleMapController>();
 
-  Future<GoogleMapController> getGoogleMapsController() =>
-      _mapsControllerCompleter.future;
+  Future<GoogleMapController> getGoogleMapsController() => _mapsControllerCompleter.future;
 
   Future<void> setSourceLatLng(LatLng sourceLatLng) async {
     if (_sourceLatLng == sourceLatLng) return;
 
     _sourceLatLng = sourceLatLng;
-    await _buildPolyLines();
-    _setSourceDestinationMarkers();
-    setState(() {});
+    await Future.wait([_buildPolyLines(), _setSourceDestinationMarkers()]);
   }
 
   Future<void> setDestinationLatLng(LatLng destinationLatLng) async {
     if (_destinationLatLng == destinationLatLng) return;
 
     _destinationLatLng = destinationLatLng;
-    await _buildPolyLines();
-    _setSourceDestinationMarkers();
-    setState(() {});
+    await Future.wait([_buildPolyLines(), _setSourceDestinationMarkers()]);
   }
 
   StreamSubscription<LatLng>? _driverCoordinatesStreamSubscription;
@@ -339,64 +462,95 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
   late LatLng _sourceLatLng;
   late LatLng _destinationLatLng;
 
+  /// Builds a [Marker] from [info], or null when it should not be rendered.
+  ///
+  /// [icon] can be passed to reuse an already resolved [BitmapDescriptor],
+  /// which matters on the driver stream where a new location can arrive many
+  /// times a second and decoding the asset each time would be wasteful.
+  Future<Marker?> _buildMarker({
+    required MarkerId markerId,
+    required MarkerIconInfo info,
+    required LatLng position,
+    BitmapDescriptor? icon,
+  }) async {
+    if (!info.isVisible) return null;
+
+    // Copied into locals so the null checks below promote, which keeps these
+    // callbacks free of null assertions.
+    final void Function(LatLng)? onTapMarker = info.onTapMarker;
+    final void Function(LatLng)? onTapInfoWindow = info.onTapInfoWindow;
+
+    return Marker(
+      markerId: markerId,
+      position: position,
+      anchor: info.anchor,
+      rotation: info.rotation,
+      icon: icon ?? await info.bitmapDescriptor,
+      onTap: onTapMarker == null ? null : () => onTapMarker(position),
+      infoWindow: InfoWindow(
+        onTap: onTapInfoWindow == null ? null : () => onTapInfoWindow(position),
+        title: info.infoWindowTitle,
+      ),
+    );
+  }
+
+  /// Adds [marker] under [markerId], or removes any existing marker when
+  /// [marker] is null. Returns whether anything actually changed.
+  bool _setOrRemoveMarker(MarkerId markerId, Marker? marker) {
+    if (marker == null) return _markersMap.remove(markerId) != null;
+
+    final previous = _markersMap[markerId];
+    _markersMap[markerId] = marker;
+    return previous != marker;
+  }
+
   /// setting source and destination markers
-  void _setSourceDestinationMarkers() async {
-    _markersMap.remove(MarkerIconInfo.sourceMarkerId);
+  Future<void> _setSourceDestinationMarkers() async {
+    final source = await _buildMarker(
+      markerId: MarkerIconInfo.sourceMarkerId,
+      info: widget.sourceMarkerIconInfo,
+      position: _sourceLatLng,
+    );
 
-    final sourceMarker = widget.sourceMarkerIconInfo;
-    if (sourceMarker.isVisible) {
-      _markersMap[MarkerIconInfo.sourceMarkerId] = Marker(
-        markerId: MarkerIconInfo.sourceMarkerId,
-        position: _sourceLatLng,
-        anchor: sourceMarker.anchor,
-        rotation: sourceMarker.rotation,
-        icon: await sourceMarker.bitmapDescriptor,
-        onTap: sourceMarker.onTapMarker == null
-            ? null
-            : () => sourceMarker.onTapMarker!(_sourceLatLng),
-        infoWindow: InfoWindow(
-          onTap: sourceMarker.onTapInfoWindow == null
-              ? null
-              : () => sourceMarker.onTapInfoWindow!(_sourceLatLng),
-          title: sourceMarker.infoWindowTitle,
-        ),
-      );
-    }
+    final destination = await _buildMarker(
+      markerId: MarkerIconInfo.destinationMarkerId,
+      info: widget.destinationMarkerIconInfo,
+      position: _destinationLatLng,
+    );
 
-    _markersMap.remove(MarkerIconInfo.destinationMarkerId);
+    // The bitmaps above are decoded asynchronously, so the widget can be gone
+    // by the time they resolve.
+    if (!mounted) return;
 
-    final destinationMarker = widget.destinationMarkerIconInfo;
-    if (destinationMarker.isVisible) {
-      _markersMap[MarkerIconInfo.destinationMarkerId] = Marker(
-        markerId: MarkerIconInfo.destinationMarkerId,
-        position: _destinationLatLng,
-        anchor: destinationMarker.anchor,
-        rotation: destinationMarker.rotation,
-        icon: await destinationMarker.bitmapDescriptor,
-        onTap: destinationMarker.onTapMarker == null
-            ? null
-            : () => destinationMarker.onTapMarker!(_destinationLatLng),
-        infoWindow: InfoWindow(
-          onTap: destinationMarker.onTapInfoWindow == null
-              ? null
-              : () => destinationMarker.onTapInfoWindow!(_destinationLatLng),
-          title: destinationMarker.infoWindowTitle,
-        ),
-      );
-    }
-
-    setState(() {});
+    setState(() {
+      _setOrRemoveMarker(MarkerIconInfo.sourceMarkerId, source);
+      _setOrRemoveMarker(MarkerIconInfo.destinationMarkerId, destination);
+    });
   }
 
   /// Build polylines from [_sourceLatLng] to [_destinationLatLng].
   Future<void> _buildPolyLines({LatLng? driverLoc}) async {
     if (!widget.showPolyline) return;
 
-    final result = await Direction.getDirections(
-      googleMapsApiKey: widget.apiKey,
-      origin: driverLoc ?? _sourceLatLng,
-      destination: _destinationLatLng,
-    );
+    final RouteDetails? result;
+    try {
+      result = await RouteDetails.getRoute(
+        googleMapsApiKey: widget.apiKey,
+        origin: driverLoc ?? _sourceLatLng,
+        destination: _destinationLatLng,
+        connectTimeout: widget.routesConnectTimeout,
+        receiveTimeout: widget.routesReceiveTimeout,
+      );
+    } catch (error, stackTrace) {
+      // A failed route must not take the map down with it, but it must also
+      // not disappear silently. Silent failure is what makes a blank map so
+      // hard to diagnose.
+      debugLogRouteError(error, stackTrace);
+      widget.onError?.call(error, stackTrace);
+      return;
+    }
+
+    if (!mounted) return;
 
     final polylineCoordinates = <LatLng>[];
 
@@ -405,7 +559,7 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
     }
 
     final polyline = Polyline(
-      polylineId: const PolylineId('default-polyline'),
+      polylineId: generatedPolylineId,
       color: widget.routeColor,
       width: widget.routeWidth,
       points: polylineCoordinates,
@@ -413,23 +567,21 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
 
     widget.onPolylineUpdate?.call(polyline);
 
-    if (driverLoc != null) _polylines.clear();
-    _polylines.add(polyline);
+    setState(() => _polylines[generatedPolylineId] = polyline);
 
     // setting map such as both source and
     // destinations markers can be seen
     if (result != null) {
       final controller = await getGoogleMapsController();
+      if (!mounted) return;
 
-      controller.animateCamera(
+      await controller.animateCamera(
         CameraUpdate.newLatLngBounds(result.bounds, 32),
       );
 
-      widget.totalTimeCallback?.call(result.totalDuration);
-      widget.totalDistanceCallback?.call(result.totalDistance);
+      widget.totalTimeCallback?.call(result.duration);
+      widget.totalDistanceCallback?.call(result.distance);
     }
-
-    setState(() {});
   }
 
   /// This function uses [GoogleMapsWidget.driverCoordinatesStream] which
@@ -440,62 +592,74 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
     final driverStream = widget.driverCoordinatesStream;
     if (driverStream == null) return;
 
-    final driverMarkerBitmapDescriptor =
-        await widget.driverMarkerIconInfo.bitmapDescriptor;
+    final driverMarkerBitmapDescriptor = await widget.driverMarkerIconInfo.bitmapDescriptor;
+    if (!mounted) return;
 
-    _driverCoordinatesStreamSubscription = driverStream.listen((coordinate) {
+    _driverCoordinatesStreamSubscription = driverStream.listen((coordinate) async {
+      if (!mounted) return;
+
       if (widget.updatePolylinesOnDriverLocUpdate) {
-        _buildPolyLines(driverLoc: coordinate);
+        unawaited(_buildPolyLines(driverLoc: coordinate));
       }
 
-      if (!widget.driverMarkerIconInfo.isVisible) return;
-
-      _markersMap.remove(MarkerIconInfo.driverMarkerId);
-
-      final driverMarker = widget.driverMarkerIconInfo;
-      _markersMap[MarkerIconInfo.driverMarkerId] = Marker(
+      final marker = await _buildMarker(
         markerId: MarkerIconInfo.driverMarkerId,
+        info: widget.driverMarkerIconInfo,
         position: coordinate,
-        anchor: driverMarker.anchor,
-        rotation: driverMarker.rotation,
         icon: driverMarkerBitmapDescriptor,
-        onTap: driverMarker.onTapMarker == null
-            ? null
-            : () => driverMarker.onTapMarker!(coordinate),
-        infoWindow: InfoWindow(
-          onTap: driverMarker.onTapInfoWindow == null
-              ? null
-              : () => driverMarker.onTapInfoWindow!(coordinate),
-          title: driverMarker.infoWindowTitle,
-        ),
       );
 
-      setState(() {});
+      if (!mounted) return;
+
+      if (_setOrRemoveMarker(MarkerIconInfo.driverMarkerId, marker)) {
+        setState(() {});
+      }
     });
   }
 
   @override
   void initState() {
+    super.initState();
+
     _sourceLatLng = widget.sourceLatLng;
     _destinationLatLng = widget.destinationLatLng;
 
     _setSourceDestinationMarkers();
     _buildPolyLines();
     _listenToDriverCoordinates();
+  }
 
-    super.initState();
+  @override
+  void didUpdateWidget(covariant GoogleMapsWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final sourceChanged = widget.sourceLatLng != oldWidget.sourceLatLng;
+    final destinationChanged = widget.destinationLatLng != oldWidget.destinationLatLng;
+
+    if (sourceChanged) _sourceLatLng = widget.sourceLatLng;
+    if (destinationChanged) _destinationLatLng = widget.destinationLatLng;
+
+    if (sourceChanged || destinationChanged) {
+      _setSourceDestinationMarkers();
+      _buildPolyLines();
+    } else if (widget.showPolyline != oldWidget.showPolyline) {
+      if (widget.showPolyline) {
+        _buildPolyLines();
+      } else {
+        setState(_polylines.clear);
+      }
+    }
+
+    if (widget.driverCoordinatesStream != oldWidget.driverCoordinatesStream) {
+      _driverCoordinatesStreamSubscription?.cancel();
+      _driverCoordinatesStreamSubscription = null;
+      _listenToDriverCoordinates();
+    }
   }
 
   @override
   void dispose() {
     _driverCoordinatesStreamSubscription?.cancel();
-
-    if (_mapsControllerCompleter.isCompleted) {
-      _mapsControllerCompleter.future.then(
-        (controller) => controller.dispose(),
-      );
-    }
-
     super.dispose();
   }
 
@@ -507,12 +671,13 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
         zoom: widget.defaultCameraZoom,
       ),
       markers: {..._markersMap.values, ...widget.markers},
-      polylines: {..._polylines, ...widget.polylines},
+      polylines: {..._polylines.values, ...widget.polylines},
       onMapCreated: (controller) {
-        _mapsControllerCompleter.complete(controller);
-        if (widget.onMapCreated != null) {
-          return widget.onMapCreated!(controller);
+        if (!_mapsControllerCompleter.isCompleted) {
+          _mapsControllerCompleter.complete(controller);
         }
+
+        widget.onMapCreated?.call(controller);
       },
       /////////////////////////////////////////////////
       // OTHER GOOGLE MAPS PARAMS
@@ -544,6 +709,19 @@ class GoogleMapsWidgetState extends State<GoogleMapsWidget> {
       onCameraIdle: widget.onCameraIdle,
       onTap: widget.onTap,
       onLongPress: widget.onLongPress,
+      style: widget.style,
+      colorScheme: widget.colorScheme,
+      clusterManagers: widget.clusterManagers,
+      groundOverlays: widget.groundOverlays,
+      heatmaps: widget.heatmaps,
+      markerType: widget.markerType,
+      fortyFiveDegreeImageryEnabled: widget.fortyFiveDegreeImageryEnabled,
+      fullscreenControlEnabled: widget.fullscreenControlEnabled,
+      mapTypeControlEnabled: widget.mapTypeControlEnabled,
+      streetViewControlEnabled: widget.streetViewControlEnabled,
+      webCameraControlEnabled: widget.webCameraControlEnabled,
+      webCameraControlPosition: widget.webCameraControlPosition,
+      webGestureHandling: widget.webGestureHandling,
     );
   }
 }

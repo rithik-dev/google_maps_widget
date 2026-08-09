@@ -4,7 +4,8 @@ version: 1.0.8
 homepage: https://github.com/rithik-dev/google_maps_widget
 repository: https://github.com/rithik-dev/google_maps_widget
 issue_tracker: https://github.com/rithik-dev/google_maps_widget/issues
-# documentation: https://github.com/rithik-dev/google_maps_widget/blob/master/README.md
+documentation: https://github.com/rithik-dev/google_maps_widget/blob/master/README.md
+
 topics: 
   - flutter
   - widget
@@ -13,21 +14,18 @@ topics:
   - google-maps-flutter
 
 environment:
-  # constraints from google_maps_flutter and dio dependencies
-  sdk: ">=3.4.0 <4.0.0"
-  flutter: ">=3.22.0"
-
-scripts:
-  pre_publish: dart format .; flutter pub publish --dry-run
-  publish_skip_validation: flutter pub publish --skip-validation
-  publish: flutter pub publish
+  sdk: ^3.10.0
+  flutter: ">=3.38.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  dio: ^5.7.0
-  google_maps_flutter: ^2.10.0
+  dio: ^5.11.0
+  google_maps_flutter: ^2.18.0
 
 dev_dependencies:
-  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0

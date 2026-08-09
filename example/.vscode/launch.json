@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // For opening the example app as the workspace root. The repository root
+      // has its own .vscode/launch.json for the other case; VS Code only reads
+      // the one belonging to the folder you opened, so the two never collide.
+      //
+      // Both point at the same example/.env, which is gitignored. Create it
+      // with GOOGLE_MAPS_API_KEY=your_key_here and press F5.
+      "name": "example (debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define-from-file=${workspaceFolder}/.env"
+      ]
+    },
+    {
+      "name": "example (profile)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "profile",
+      "toolArgs": [
+        "--dart-define-from-file=${workspaceFolder}/.env"
+      ]
+    },
+    {
+      "name": "example (release)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "toolArgs": [
+        "--dart-define-from-file=${workspaceFolder}/.env"
+      ]
+    }
+  ]
+}

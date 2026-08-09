@@ -112,9 +112,7 @@ class MarkerIconInfo {
       targetHeight: size.height.toInt(),
     );
     FrameInfo fi = await codec.getNextFrame();
-    final bytes = (await fi.image.toByteData(format: ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+    final bytes = (await fi.image.toByteData(format: ImageByteFormat.png))!.buffer.asUint8List();
 
     return BitmapDescriptor.bytes(
       bytes,

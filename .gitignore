@@ -75,3 +75,9 @@ build/
 
 # FVM Version Cache
 .fvm/
+
+# Secrets. Patterns without a slash match at every level, so this also covers
+# example/.env. A committed .env.example template stays allowed.
+.env
+.env.*
+!.env.example

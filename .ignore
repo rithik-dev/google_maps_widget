@@ -1,0 +1,19 @@
+# Files Claude Code and other ripgrep-based tooling should not surface in
+# search results or the file picker.
+#
+# This hides them from listing and search. Blocking the Read tool outright is
+# done separately, in .claude/settings.json under permissions.deny.
+.env
+.env.*
+*.keystore
+*.jks
+*.p12
+*.pem
+key.properties
+local.properties
+google-services.json
+GoogleService-Info.plist
+secrets.*
+**/.env
+**/.env.*
+example/.env

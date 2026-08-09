@@ -1,0 +1,15 @@
+# Secrets. Never ship a local environment file, even though pub already skips
+# dotfiles, so that the intent is explicit and survives future pub changes.
+.env
+.env.*
+**/.env
+**/.env.*
+example/.env
+
+# A .pubignore makes `dart pub publish` ignore .gitignore entirely, so every
+# non-hidden path .gitignore was keeping out of the archive has to be repeated
+# here. Without this the archive grows from ~124 KB to ~14 MB, because
+# example/build ships.
+build/
+**/build/
+example/build/
