@@ -6,7 +6,15 @@ repository: https://github.com/rithik-dev/google_maps_widget
 issue_tracker: https://github.com/rithik-dev/google_maps_widget/issues
 documentation: https://github.com/rithik-dev/google_maps_widget/blob/master/README.md
 
-topics: 
+# Path must point under screenshots/published/, not screenshots/unpublished/ (see the .pubignore
+# in that folder) or any hidden directory: pub.dev builds the search thumbnail and the package page
+# gallery from the file it actually receives, and `pub publish --dry-run` does not warn if the path
+# resolves locally but is excluded from what gets published. This fails silently.
+screenshots:
+  - description: 'A driver marker following a live-updating route to the destination.'
+    path: screenshots/published/route.webp
+
+topics:
   - flutter
   - widget
   - google

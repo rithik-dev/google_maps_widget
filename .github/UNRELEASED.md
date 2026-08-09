@@ -21,3 +21,6 @@
 * The example app no longer needs the API key committed. Put it in a gitignored `example/.env` and run with `--dart-define-from-file=.env`, which covers the Dart code, the Android manifest and the iOS Info.plist from one entry, the last through a build phase that decodes `DART_DEFINES`. Checked-in VS Code launch configurations read the same file, so pressing F5 needs no setup. All three fall back to a `PASTE_GOOGLE_MAPS_API_KEY_HERE` placeholder.
 * The example README now covers the requirements, how to get a key, and how to build and run on each platform.
 * Documented where the API key is needed, and why an application restricted key cannot authorise the Routes API call.
+* Added a screenshot to the package listing, so pub.dev now shows a thumbnail in search results and a gallery on the package page.
+* README: dropped the popularity and code size badges, which had stopped being useful, added a downloads badge, and added links to the author's portfolio and other packages.
+* README: the screenshots are now served from this repository instead of GitHub's attachment CDN, which was outside the repo's control and could have gone stale.

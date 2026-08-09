@@ -1,10 +1,12 @@
 # [GoogleMapsWidget](https://pub.dev/packages/google_maps_widget) For Flutter
 [![pub package](https://img.shields.io/pub/v/google_maps_widget.svg)](https://pub.dev/packages/google_maps_widget)
+[![downloads](https://img.shields.io/pub/dm/google_maps_widget)](https://pub.dev/packages/google_maps_widget)
 [![likes](https://img.shields.io/pub/likes/google_maps_widget)](https://pub.dev/packages/google_maps_widget/score)
-[![popularity](https://img.shields.io/pub/popularity/google_maps_widget)](https://pub.dev/packages/google_maps_widget/score)
 [![pub points](https://img.shields.io/pub/points/google_maps_widget)](https://pub.dev/packages/google_maps_widget/score)
-[![code size](https://img.shields.io/github/languages/code-size/rithik-dev/google_maps_widget)](https://github.com/rithik-dev/google_maps_widget)
 [![license MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://opensource.org/licenses/MIT)
+
+<a href="https://rithikbhandari.dev" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/portfolio-rithikbhandari.dev-6C63FF?style=for-the-badge" alt="portfolio"></a>
+<a href="https://pub.dev/publishers/rithikbhandari.dev/packages" target="_blank" rel="noopener"><img src="https://img.shields.io/pub/publisher/google_maps_widget?style=for-the-badge" alt="publisher"></a>
 
 ---
 
@@ -25,7 +27,7 @@ A widget for flutter developers to easily integrate google maps in their apps. I
 - **[❓ Usage](#-usage)**  
 - **[🚚 Migrating](#-migrating)**
 - **[🎯 Sample Usage](#-sample-usage)**
-- **[👤 Collaborators](#-collaborators)**
+- **[👤 Author](#-author)**
 
 ---
 
@@ -33,7 +35,7 @@ A widget for flutter developers to easily integrate google maps in their apps. I
 
 | With Source InfoWindow | With Rider Icon | With Rider Icon InfoWindow |
 |-----------------------------------|-------------------------------------|-------------------------------------|
-| <img src="https://user-images.githubusercontent.com/56810766/114386992-8fdadf00-9baf-11eb-84f2-22593024b533.png" height="500"> | <img src="https://user-images.githubusercontent.com/56810766/114386995-90737580-9baf-11eb-8cd7-056444554204.png" height="500"> | <img src="https://user-images.githubusercontent.com/56810766/114386985-8e111b80-9baf-11eb-9bfa-8e4d6d3364f5.png" height="500"> |
+| <img src="https://github.com/rithik-dev/google_maps_widget/raw/master/screenshots/unpublished/source-info-window.webp" height="500"> | <img src="https://github.com/rithik-dev/google_maps_widget/raw/master/screenshots/published/route.webp" height="500"> | <img src="https://github.com/rithik-dev/google_maps_widget/raw/master/screenshots/unpublished/rider-info-window.webp" height="500"> |
 
 ---
 
@@ -625,9 +627,11 @@ class _Metric extends StatelessWidget {
 
 ---
 
-# 👤 Collaborators
+# 👤 Author
 
+Built and maintained by **Rithik Bhandari**, a mobile developer building cross-platform apps with Flutter.
 
-| Name | GitHub | Linkedin |
-|-----------------------------------|-------------------------------------|-------------------------------------|
-| Rithik Bhandari | [github/rithik-dev](https://github.com/rithik-dev) | [linkedin/rithik-bhandari](https://www.linkedin.com/in/rithik-bhandari) |
+- 🌐 Portfolio: **[rithikbhandari.dev](https://rithikbhandari.dev)**
+- 📦 More packages: [pub.dev/publishers/rithikbhandari.dev](https://pub.dev/publishers/rithikbhandari.dev/packages)
+- 💻 GitHub: [@rithik-dev](https://github.com/rithik-dev)
+- 💼 LinkedIn: [rithik-bhandari](https://www.linkedin.com/in/rithik-bhandari)
